@@ -64,27 +64,24 @@ class IdionTest(unittest.TestCase):
 
         self.assertTrue(self.runsInLessThanNMillisecondsOneArg(customerBook.removeCustomerNamed, paulMcCartney, 100))
 
+    def failsWithExceptionTypeOneArg(self, method, arg1, error_type, error_message, book, number_of_customers):
+        try:
+            method(arg1)
+            return false
+        except error_type as exception:
+            return exception.message == error_message and book.numberOfCustomers() == number_of_customers
+        return false
+
     def testCanNotAddACustomerWithEmptyName(self):
         customerBook = CustomerBook()
-        
-        try:
-            customerBook.addCustomerNamed('')
-            self.fail()
-        except ValueError as exception:
-            self.assertEquals(exception.message,CustomerBook.CUSTOMER_NAME_CAN_NOT_BE_EMPTY)
-            self.assertTrue(customerBook.isEmpty())
+        self.assertTrue(self.failsWithExceptionTypeOneArg(customerBook.addCustomerNamed, "", ValueError, CustomerBook.CUSTOMER_NAME_CAN_NOT_BE_EMPTY, customerBook, 0))
                  
     def testCanNotRemoveNotAddedCustomer(self):
         customerBook = CustomerBook()
         customerBook.addCustomerNamed('Paul McCartney')
-        
-        try:
-            customerBook.removeCustomerNamed('John Lennon')
-            self.fail()
-        except KeyError as exception:
-            self.assertEquals(exception.message,CustomerBook.INVALID_CUSTOMER_NAME)
-            self.assertTrue(customerBook.numberOfCustomers()==1)
-            self.assertTrue(customerBook.includesCustomerNamed('Paul McCartney'))
+
+        self.assertTrue(self.failsWithExceptionTypeOneArg(customerBook.removeCustomerNamed, 'John Lennon', KeyError, CustomerBook.INVALID_CUSTOMER_NAME, customerBook, 1))
+        self.assertTrue(customerBook.includesCustomerNamed('Paul McCartney'))
 
       
 if __name__ == "__main__":
