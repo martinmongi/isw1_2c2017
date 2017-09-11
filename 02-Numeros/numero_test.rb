@@ -41,7 +41,7 @@ class NumberTest < Minitest::Test
   end
 
   def test_04_multiplica_enteros_correctamente
-    assert_equal @cuatro,@dos*@dos
+    assert_equal @cuatro,(@dos.multiplicar_un_entero @dos)
   end
 
   def test_05_divide_enteros_correctamente
@@ -62,7 +62,7 @@ class NumberTest < Minitest::Test
   end
 
   def test_07_multiplica_fracciones_correctamente
-    assert_equal @dosVeinticincoavos,@unQuinto*@dosQuintos
+    assert_equal @dosVeinticincoavos,(@unQuinto.multiplicar_una_fraccion @dosQuintos)
     #
     # La multiplicación de fracciones es:
     #
@@ -94,18 +94,18 @@ class NumberTest < Minitest::Test
   end
 
   def test_10_suma_fracciones_con_enteros_correctamente
-    assert_equal @seisQuintos,(@unQuinto.sumar_un_entero@uno)
+    assert_equal @seisQuintos,(@unQuinto.sumar_un_entero @uno)
   end
 
   #
   # Hacemos lo mismo para la multipliación
   #
   def test_11_multiplica_enteros_con_fracciones_correctamente
-    assert_equal @dosQuintos,@dos*@unQuinto
+    assert_equal @dosQuintos,(@dos.multiplicar_una_fraccion @unQuinto)
   end
 
   def test_12_multiplica_fracciones_con_enteros_correctamente
-    assert_equal @dosQuintos,@unQuinto*@dos
+    assert_equal @dosQuintos,(@unQuinto.multiplicar_un_entero @dos)
   end
 
   #
@@ -157,7 +157,7 @@ class NumberTest < Minitest::Test
   end
 
   def test_18_la_multiplicacion_de_enteros_y_fracciones_puede_dar_entero
-    assert_equal @dos,@cuatro*@unMedio
+    assert_equal @dos,(@cuatro.multiplicar_una_fraccion @unMedio)
   end
 
   def test_19_la_division_de_enteros_puede_dar_fraccion

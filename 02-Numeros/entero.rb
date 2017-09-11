@@ -36,14 +36,13 @@ class Entero < Numero
     return una_fraccion
   end
 
-  def *(un_multiplicador)
-    if un_multiplicador.kind_of?(Entero)
-      return Entero.new @value*un_multiplicador.value
-    else
-      un_numerador = Entero.new @value*un_multiplicador.numerador.value
-      una_fraccion = Fraccion.dividir un_numerador,un_multiplicador.denominador
-      return una_fraccion
-     end
+  def multiplicar_un_entero(un_entero)
+    return Entero.new @value*un_entero.value
+  end
+   
+  def multiplicar_una_fraccion(una_fraccion)
+    un_numerador = Entero.new @value*una_fraccion.numerador.value
+    return Fraccion.dividir un_numerador,una_fraccion.denominador
   end
 
   def /(un_divisor)

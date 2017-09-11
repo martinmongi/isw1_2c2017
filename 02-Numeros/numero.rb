@@ -20,7 +20,12 @@ class Numero
     self.subclass_responsibility
   end
 
-  def *(un_multiplicador)
+
+  def multiplicar_un_entero(un_entero)
+    self.subclass_responsibility
+  end
+
+  def multiplicar_una_fraccion(una_fraccion)
     self.subclass_responsibility
   end
 
