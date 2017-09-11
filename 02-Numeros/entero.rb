@@ -45,15 +45,14 @@ class Entero < Numero
     return Fraccion.dividir un_numerador,una_fraccion.denominador
   end
 
-  def /(un_divisor)
-    if un_divisor.kind_of?(Entero)
-      unDividendo = self
-      Fraccion.dividir unDividendo,un_divisor
-    else
-      un_numerador = Entero.new @value*un_divisor.denominador.value
-      una_fraccion = Fraccion.dividir un_numerador,un_divisor.numerador
-      return una_fraccion
-    end
+  def dividir_un_entero(un_entero)
+    unDividendo = self
+    return Fraccion.dividir unDividendo,un_entero
+  end
+
+  def dividir_una_fraccion(una_fraccion)
+    un_numerador = Entero.new @value*una_fraccion.denominador.value
+    return Fraccion.dividir un_numerador,una_fraccion.numerador
   end
 
   def maximo_comun_divisor_con(otro_entero)

@@ -29,7 +29,11 @@ class Numero
     self.subclass_responsibility
   end
 
-  def /(un_divisor)
+  def dividir_un_entero(un_entero)
+    self.subclass_responsibility
+  end
+  
+  def dividir_una_fraccion(una_fraccion)
     self.subclass_responsibility
   end
 

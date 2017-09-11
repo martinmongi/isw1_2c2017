@@ -37,33 +37,38 @@ class Fraccion < Numero
 
   def sumar_un_entero(un_entero)
 
-    una_fraccion =  (@numerador.sumar_un_entero @denominador.multiplicar_un_entero un_entero)/(@denominador)
+    una_fraccion =  (@numerador.sumar_un_entero @denominador.multiplicar_un_entero un_entero).dividir_un_entero (@denominador)
     return una_fraccion
     
   end
 
   def sumar_una_fraccion(una_fraccion)
-    return ((@numerador.multiplicar_un_entero una_fraccion.denominador).sumar_un_entero @denominador.multiplicar_un_entero una_fraccion.numerador)/(@denominador.multiplicar_un_entero una_fraccion.denominador)
+    return ((@numerador.multiplicar_un_entero una_fraccion.denominador).sumar_un_entero @denominador.multiplicar_un_entero una_fraccion.numerador).dividir_un_entero (@denominador.multiplicar_un_entero una_fraccion.denominador)
 
   end
 
   def multiplicar_un_entero(un_entero)
-    return (@numerador.multiplicar_un_entero un_entero)/(@denominador)
+    return (@numerador.multiplicar_un_entero un_entero).dividir_un_entero (@denominador)
   end
    
   def multiplicar_una_fraccion(una_fraccion)
-    return (@numerador.multiplicar_un_entero una_fraccion.numerador)/(@denominador.multiplicar_un_entero una_fraccion.denominador)
+    return (@numerador.multiplicar_un_entero una_fraccion.numerador).dividir_un_entero (@denominador.multiplicar_un_entero una_fraccion.denominador)
   end
 
+  
 
-  def /(un_divisor)
-    if un_divisor.kind_of?(Fraccion)
-      un_dividendo = self
-      (un_dividendo.numerador.multiplicar_un_entero un_divisor.denominador)/(un_dividendo.denominador.multiplicar_un_entero un_divisor.numerador)
-    else
-      una_fraccion = (@numerador)/(@denominador.multiplicar_un_entero un_divisor)
-      return una_fraccion
-    end
+  def dividir_un_entero(un_entero)
+
+    una_fraccion = (@numerador).dividir_un_entero (@denominador.multiplicar_un_entero un_entero)
+    return una_fraccion
+  
+  end
+
+  def dividir_una_fraccion(una_fraccion)
+
+    un_dividendo = self
+    (un_dividendo.numerador.multiplicar_un_entero una_fraccion.denominador).dividir_un_entero (un_dividendo.denominador.multiplicar_un_entero una_fraccion.numerador)
+
   end
 
   def self.dividir(un_dividendo,un_divisor)
