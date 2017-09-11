@@ -37,7 +37,7 @@ class NumberTest < Minitest::Test
   end
 
   def test_03_suma_enteros_correctamente
-    assert_equal @dos,@uno+@uno
+    assert_equal @dos,(@uno.sumar_un_entero @uno)
   end
 
   def test_04_multiplica_enteros_correctamente
@@ -51,7 +51,7 @@ class NumberTest < Minitest::Test
   def test_06_suma_fracciones_correctamente
     sieteDecimos = nil # <- REEMPLAZAR POR LO QUE CORRESPONDA
     sieteDecimos = (Entero.new 7)/(Entero.new 10)
-    assert_equal sieteDecimos,@unQuinto+@unMedio
+    assert_equal sieteDecimos,(@unQuinto.sumar_una_fraccion @unMedio)
     #
     # La suma de fracciones es:
     #
@@ -90,11 +90,11 @@ class NumberTest < Minitest::Test
   # y fracciones con enteros
   #
   def test_09_suma_enteros_con_fracciones_correctamente
-    assert_equal @seisQuintos,@uno+@unQuinto
+    assert_equal @seisQuintos,(@uno.sumar_una_fraccion @unQuinto)
   end
 
   def test_10_suma_fracciones_con_enteros_correctamente
-    assert_equal @seisQuintos,@unQuinto+@uno
+    assert_equal @seisQuintos,(@unQuinto.sumar_un_entero@uno)
   end
 
   #
@@ -153,7 +153,7 @@ class NumberTest < Minitest::Test
   end
 
   def test_17_la_suma_de_fracciones_puede_dar_entero
-    assert_equal @uno,@unMedio+@unMedio
+    assert_equal @uno,(@unMedio.sumar_una_fraccion @unMedio)
   end
 
   def test_18_la_multiplicacion_de_enteros_y_fracciones_puede_dar_entero

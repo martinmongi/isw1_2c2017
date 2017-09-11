@@ -35,15 +35,19 @@ class Fraccion < Numero
     @numerador.hash
   end
 
-  def +(un_sumando)
+  def sumar_un_entero(un_entero)
 
-    if un_sumando.kind_of?(Fraccion)
-      return (@numerador*un_sumando.denominador+@denominador*un_sumando.numerador)/(@denominador*un_sumando.denominador)
-    else
-      una_fraccion =  (@numerador+@denominador*un_sumando)/(@denominador)
-      return una_fraccion
-    end
+    una_fraccion =  (@numerador.sumar_un_entero @denominador*un_entero)/(@denominador)
+    return una_fraccion
     
+  end
+
+  def sumar_una_fraccion(una_fraccion)
+    puts "una_fraccion #{una_fraccion}"
+    puts "numerador #{@numerador.value}"
+    puts "denominador #{@denominador.value}"
+    return ((@numerador*una_fraccion.denominador).sumar_un_entero @denominador*una_fraccion.numerador)/(@denominador*una_fraccion.denominador)
+
   end
 
   def *(un_multiplicador)

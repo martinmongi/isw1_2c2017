@@ -12,7 +12,11 @@ class Numero
     self.subclass_responsibility
   end
 
-  def +(un_sumando)
+  def sumar_un_entero(un_entero)
+    self.subclass_responsibility
+  end
+
+  def sumar_una_fraccion(una_fraccion)
     self.subclass_responsibility
   end
 

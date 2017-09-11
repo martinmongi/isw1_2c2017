@@ -26,14 +26,14 @@ class Entero < Numero
     @value.hash
   end
 
-  def +(un_sumando)
-    if un_sumando.kind_of?(Entero)
-      return Entero.new @value+un_sumando.value
-    else
-      un_numerador = Entero.new @value*un_sumando.denominador.value+un_sumando.numerador.value
-      una_fraccion = Fraccion.dividir un_numerador,un_sumando.denominador
-      return una_fraccion
-    end
+  def sumar_un_entero(un_entero)
+    return Entero.new @value+un_entero.value
+  end
+
+  def sumar_una_fraccion(una_fraccion)
+    un_numerador = Entero.new @value*una_fraccion.denominador.value+una_fraccion.numerador.value
+    una_fraccion = Fraccion.dividir un_numerador,una_fraccion.denominador
+    return una_fraccion
   end
 
   def *(un_multiplicador)
