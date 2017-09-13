@@ -170,13 +170,13 @@ class NumberTest < Minitest::Test
 
   def test_21_no_se_puede_dividir_enteros_por_cero
     assert_raises ZeroDivisionError do
-      @uno.dividir_por_un_entero @cero
+      @uno.dividir_por_cero 
     end
   end
 
   def test_22_no_se_puede_dividir_fracciones_por_cero
     assert_raises ZeroDivisionError do
-      @unQuinto.dividir_por_un_entero @cero
+      @unQuinto.dividir_por_cero
     end
   end
 

@@ -54,8 +54,6 @@ class Fraccion < Numero
     return (@numerador.multiplicar_por_un_entero una_fraccion.numerador).dividir_por_un_entero (@denominador.multiplicar_por_un_entero una_fraccion.denominador)
   end
 
-  
-
   def dividir_por_un_entero(un_entero)
 
     una_fraccion = (@numerador).dividir_por_un_entero (@denominador.multiplicar_por_un_entero un_entero)
@@ -71,7 +69,6 @@ class Fraccion < Numero
   end
 
   def self.dividir(un_dividendo,un_divisor)
-    raise ZeroDivisionError.new if un_divisor.es_cero
     return un_dividendo if un_dividendo.es_cero
 
     maximo_comun_divisor = un_dividendo.maximo_comun_divisor_con un_divisor

@@ -54,7 +54,7 @@ class Entero < Numero
     un_numerador = Entero.new @value*una_fraccion.denominador.value
     return Fraccion.dividir un_numerador,una_fraccion.numerador
   end
-
+  
   def maximo_comun_divisor_con(otro_entero)
     if otro_entero.es_cero
       self

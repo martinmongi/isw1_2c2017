@@ -35,5 +35,9 @@ class Numero
   def dividir_por_una_fraccion(una_fraccion)
     self.subclass_responsibility
   end
-
+  
+  def dividir_por_cero()
+    raise ZeroDivisionError.new
+  end
+  
 end
