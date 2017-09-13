@@ -15,15 +15,15 @@ class NumberTest < Minitest::Test
     @cuatro = Entero.new 4
     @cinco = Entero.new 5
 
-    @unQuinto = @uno.dividir_un_entero @cinco
-    @dosQuintos = @dos.dividir_un_entero @cinco
-    @tresQuintos = @tres.dividir_un_entero @cinco
-    @dosVeinticincoavos = @dos.dividir_un_entero (Entero.new 25)
-    @unMedio = @uno.dividir_un_entero @dos
-    @cincoMedios = @cinco.dividir_un_entero @dos
-    @seisQuintos = (Entero.new 6).dividir_un_entero @cinco
-    @cuatroMedios = @cuatro.dividir_un_entero @dos
-    @dosCuartos = @dos.dividir_un_entero @cuatro
+    @unQuinto = @uno.dividir_por_un_entero @cinco
+    @dosQuintos = @dos.dividir_por_un_entero @cinco
+    @tresQuintos = @tres.dividir_por_un_entero @cinco
+    @dosVeinticincoavos = @dos.dividir_por_un_entero (Entero.new 25)
+    @unMedio = @uno.dividir_por_un_entero @dos
+    @cincoMedios = @cinco.dividir_por_un_entero @dos
+    @seisQuintos = (Entero.new 6).dividir_por_un_entero @cinco
+    @cuatroMedios = @cuatro.dividir_por_un_entero @dos
+    @dosCuartos = @dos.dividir_por_un_entero @cuatro
   end
 
   def test_01_es_cero_devuelve_true_solo_para_cero
@@ -37,21 +37,21 @@ class NumberTest < Minitest::Test
   end
 
   def test_03_suma_enteros_correctamente
-    assert_equal @dos,(@uno.sumar_un_entero @uno)
+    assert_equal @dos,(@uno.mas_un_entero @uno)
   end
 
   def test_04_multiplica_enteros_correctamente
-    assert_equal @cuatro,(@dos.multiplicar_un_entero @dos)
+    assert_equal @cuatro,(@dos.multiplicar_por_un_entero @dos)
   end
 
   def test_05_divide_enteros_correctamente
-    assert_equal @uno,(@dos.dividir_un_entero @dos)
+    assert_equal @uno,(@dos.dividir_por_un_entero @dos)
   end
 
   def test_06_suma_fracciones_correctamente
     sieteDecimos = nil # <- REEMPLAZAR POR LO QUE CORRESPONDA
-    sieteDecimos = (Entero.new 7).dividir_un_entero (Entero.new 10)
-    assert_equal sieteDecimos,(@unQuinto.sumar_una_fraccion @unMedio)
+    sieteDecimos = (Entero.new 7).dividir_por_un_entero (Entero.new 10)
+    assert_equal sieteDecimos,(@unQuinto.mas_una_fraccion @unMedio)
     #
     # La suma de fracciones es:
     #
@@ -62,7 +62,7 @@ class NumberTest < Minitest::Test
   end
 
   def test_07_multiplica_fracciones_correctamente
-    assert_equal @dosVeinticincoavos,(@unQuinto.multiplicar_una_fraccion @dosQuintos)
+    assert_equal @dosVeinticincoavos,(@unQuinto.multiplicar_por_una_fraccion @dosQuintos)
     #
     # La multiplicación de fracciones es:
     #
@@ -74,7 +74,7 @@ class NumberTest < Minitest::Test
   end
 
   def test_08_divide_fracciones_correctamente
-    assert_equal @cincoMedios,(@unMedio.dividir_una_fraccion @unQuinto)
+    assert_equal @cincoMedios,(@unMedio.dividir_por_una_fraccion @unQuinto)
     #
     # La división de fracciones es:
     #
@@ -90,33 +90,33 @@ class NumberTest < Minitest::Test
   # y fracciones con enteros
   #
   def test_09_suma_enteros_con_fracciones_correctamente
-    assert_equal @seisQuintos,(@uno.sumar_una_fraccion @unQuinto)
+    assert_equal @seisQuintos,(@uno.mas_una_fraccion @unQuinto)
   end
 
   def test_10_suma_fracciones_con_enteros_correctamente
-    assert_equal @seisQuintos,(@unQuinto.sumar_un_entero @uno)
+    assert_equal @seisQuintos,(@unQuinto.mas_un_entero @uno)
   end
 
   #
   # Hacemos lo mismo para la multipliación
   #
   def test_11_multiplica_enteros_con_fracciones_correctamente
-    assert_equal @dosQuintos,(@dos.multiplicar_una_fraccion @unQuinto)
+    assert_equal @dosQuintos,(@dos.multiplicar_por_una_fraccion @unQuinto)
   end
 
   def test_12_multiplica_fracciones_con_enteros_correctamente
-    assert_equal @dosQuintos,(@unQuinto.multiplicar_un_entero @dos)
+    assert_equal @dosQuintos,(@unQuinto.multiplicar_por_un_entero @dos)
   end
 
   #
   # Hacemos lo mismo para la division
   #
   def test_13_divide_enteros_por_fracciones_correctamente
-    assert_equal @cincoMedios,(@uno.dividir_una_fraccion @dosQuintos)
+    assert_equal @cincoMedios,(@uno.dividir_por_una_fraccion @dosQuintos)
   end
 
   def test_14_divide_fracciones_por_enteros_correctamente
-    assert_equal @dosVeinticincoavos,(@dosQuintos.dividir_un_entero @cinco)
+    assert_equal @dosVeinticincoavos,(@dosQuintos.dividir_por_un_entero @cinco)
   end
 
   #
@@ -153,30 +153,30 @@ class NumberTest < Minitest::Test
   end
 
   def test_17_la_suma_de_fracciones_puede_dar_entero
-    assert_equal @uno,(@unMedio.sumar_una_fraccion @unMedio)
+    assert_equal @uno,(@unMedio.mas_una_fraccion @unMedio)
   end
 
   def test_18_la_multiplicacion_de_enteros_y_fracciones_puede_dar_entero
-    assert_equal @dos,(@cuatro.multiplicar_una_fraccion @unMedio)
+    assert_equal @dos,(@cuatro.multiplicar_por_una_fraccion @unMedio)
   end
 
   def test_19_la_division_de_enteros_puede_dar_fraccion
-    assert_equal @unMedio,(@dos.dividir_un_entero @cuatro)
+    assert_equal @unMedio,(@dos.dividir_por_un_entero @cuatro)
   end
 
   def test_20_la_division_de_fracciones_puede_dar_entero
-    assert_equal @uno,(@unMedio.dividir_una_fraccion @unMedio)
+    assert_equal @uno,(@unMedio.dividir_por_una_fraccion @unMedio)
   end
 
   def test_21_no_se_puede_dividir_enteros_por_cero
     assert_raises ZeroDivisionError do
-      @uno.dividir_un_entero @cero
+      @uno.dividir_por_un_entero @cero
     end
   end
 
   def test_22_no_se_puede_dividir_fracciones_por_cero
     assert_raises ZeroDivisionError do
-      @unQuinto.dividir_un_entero @cero
+      @unQuinto.dividir_por_un_entero @cero
     end
   end
 

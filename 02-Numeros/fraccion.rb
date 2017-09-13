@@ -28,46 +28,45 @@ class Fraccion < Numero
   end
 
   def igual_a_fraccion(una_fraccion)
-    (@numerador.multiplicar_un_entero una_fraccion.denominador) == (@denominador.multiplicar_un_entero una_fraccion.numerador)
+    (@numerador.multiplicar_por_un_entero una_fraccion.denominador) == (@denominador.multiplicar_por_un_entero una_fraccion.numerador)
   end
 
   def hash
     @numerador.hash
   end
 
-  def sumar_un_entero(un_entero)
-
-    una_fraccion =  (@numerador.sumar_un_entero @denominador.multiplicar_un_entero un_entero).dividir_un_entero (@denominador)
+  def mas_un_entero(un_entero)
+    una_fraccion =  (@numerador.mas_un_entero @denominador.multiplicar_por_un_entero un_entero).dividir_por_un_entero (@denominador)
     return una_fraccion
     
   end
 
-  def sumar_una_fraccion(una_fraccion)
-    return ((@numerador.multiplicar_un_entero una_fraccion.denominador).sumar_un_entero @denominador.multiplicar_un_entero una_fraccion.numerador).dividir_un_entero (@denominador.multiplicar_un_entero una_fraccion.denominador)
+  def mas_una_fraccion(una_fraccion)
+    return ((@numerador.multiplicar_por_un_entero una_fraccion.denominador).mas_un_entero @denominador.multiplicar_por_un_entero una_fraccion.numerador).dividir_por_un_entero (@denominador.multiplicar_por_un_entero una_fraccion.denominador)
 
   end
 
-  def multiplicar_un_entero(un_entero)
-    return (@numerador.multiplicar_un_entero un_entero).dividir_un_entero (@denominador)
+  def multiplicar_por_un_entero(un_entero)
+    return (@numerador.multiplicar_por_un_entero un_entero).dividir_por_un_entero (@denominador)
   end
    
-  def multiplicar_una_fraccion(una_fraccion)
-    return (@numerador.multiplicar_un_entero una_fraccion.numerador).dividir_un_entero (@denominador.multiplicar_un_entero una_fraccion.denominador)
+  def multiplicar_por_una_fraccion(una_fraccion)
+    return (@numerador.multiplicar_por_un_entero una_fraccion.numerador).dividir_por_un_entero (@denominador.multiplicar_por_un_entero una_fraccion.denominador)
   end
 
   
 
-  def dividir_un_entero(un_entero)
+  def dividir_por_un_entero(un_entero)
 
-    una_fraccion = (@numerador).dividir_un_entero (@denominador.multiplicar_un_entero un_entero)
+    una_fraccion = (@numerador).dividir_por_un_entero (@denominador.multiplicar_por_un_entero un_entero)
     return una_fraccion
   
   end
 
-  def dividir_una_fraccion(una_fraccion)
+  def dividir_por_una_fraccion(una_fraccion)
 
     un_dividendo = self
-    (un_dividendo.numerador.multiplicar_un_entero una_fraccion.denominador).dividir_un_entero (un_dividendo.denominador.multiplicar_un_entero una_fraccion.numerador)
+    (un_dividendo.numerador.multiplicar_por_un_entero una_fraccion.denominador).dividir_por_un_entero (un_dividendo.denominador.multiplicar_por_un_entero una_fraccion.numerador)
 
   end
 
