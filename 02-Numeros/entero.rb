@@ -26,35 +26,35 @@ class Entero < Numero
     @value.hash
   end
 
-  def sumar_un_entero(un_entero)
+  def mas_un_entero(un_entero)
     return Entero.new @value+un_entero.value
   end
 
-  def sumar_una_fraccion(una_fraccion)
+  def mas_una_fraccion(una_fraccion)
     un_numerador = Entero.new @value*una_fraccion.denominador.value+una_fraccion.numerador.value
     una_fraccion = Fraccion.dividir un_numerador,una_fraccion.denominador
     return una_fraccion
   end
 
-  def multiplicar_un_entero(un_entero)
+  def multiplicar_por_un_entero(un_entero)
     return Entero.new @value*un_entero.value
   end
    
-  def multiplicar_una_fraccion(una_fraccion)
+  def multiplicar_por_una_fraccion(una_fraccion)
     un_numerador = Entero.new @value*una_fraccion.numerador.value
     return Fraccion.dividir un_numerador,una_fraccion.denominador
   end
 
-  def dividir_un_entero(un_entero)
+  def dividir_por_un_entero(un_entero)
     unDividendo = self
     return Fraccion.dividir unDividendo,un_entero
   end
 
-  def dividir_una_fraccion(una_fraccion)
+  def dividir_por_una_fraccion(una_fraccion)
     un_numerador = Entero.new @value*una_fraccion.denominador.value
     return Fraccion.dividir un_numerador,una_fraccion.numerador
   end
-
+  
   def maximo_comun_divisor_con(otro_entero)
     if otro_entero.es_cero
       self

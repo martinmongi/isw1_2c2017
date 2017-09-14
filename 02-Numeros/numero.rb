@@ -12,29 +12,32 @@ class Numero
     self.subclass_responsibility
   end
 
-  def sumar_un_entero(un_entero)
+  def mas_un_entero(un_entero)
     self.subclass_responsibility
   end
 
-  def sumar_una_fraccion(una_fraccion)
+  def mas_una_fraccion(una_fraccion)
     self.subclass_responsibility
   end
 
-
-  def multiplicar_un_entero(un_entero)
+  def multiplicar_por_un_entero(un_entero)
     self.subclass_responsibility
   end
 
-  def multiplicar_una_fraccion(una_fraccion)
+  def multiplicar_por_una_fraccion(una_fraccion)
     self.subclass_responsibility
   end
 
-  def dividir_un_entero(un_entero)
+  def dividir_por_un_entero(un_entero)
     self.subclass_responsibility
   end
   
-  def dividir_una_fraccion(una_fraccion)
+  def dividir_por_una_fraccion(una_fraccion)
     self.subclass_responsibility
   end
-
+  
+  def dividir_por_cero()
+    raise ZeroDivisionError.new
+  end
+  
 end
