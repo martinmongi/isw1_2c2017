@@ -75,7 +75,7 @@ class Stack:
         return self.internal_stack.isEmpty()
     
     def size(self):
-        return self.internal_stack.internal_size
+        return self.internal_stack.size()
     
 class StackTest(unittest.TestCase):
     
