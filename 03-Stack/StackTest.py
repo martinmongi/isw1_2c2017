@@ -24,8 +24,7 @@ class Node:
         pass
 
 class EmptyNode(Node):
-    def __init__(self, anObject):
-        self.internal_size = 0
+    def __init__(self):
         pass
 
     def isEmpty(self):
@@ -35,13 +34,13 @@ class EmptyNode(Node):
         raise Exception(self.STACK_EMPTY_DESCRIPTION)
 
     def size(self):
-        return self.internal_size
+        return 0
 
 class NonEmptyNode(Node):
     def __init__(self, anObject, next):
         self.internal_value = anObject
         self.next = next
-        self.internal_size = next.internal_size + 1
+        self.internal_size = next.size() + 1
     
     def isEmpty(self):
         return False
@@ -57,7 +56,7 @@ class Stack:
     STACK_EMPTY_DESCRIPTION = 'Stack is empty'
 
     def __init__(self):
-        self.internal_stack = EmptyNode(None)
+        self.internal_stack = EmptyNode()
 
     def push(self, anObject):
         new_node = NonEmptyNode(anObject, self.internal_stack)
