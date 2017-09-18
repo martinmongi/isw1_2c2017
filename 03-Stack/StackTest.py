@@ -9,34 +9,73 @@
 #  
 
 import unittest
+from abc import ABCMeta, abstractmethod
+
+class Node:
+    __metaclass__ = ABCMeta
+    STACK_EMPTY_DESCRIPTION = 'Stack is empty'
+
+    @abstractmethod
+    def __init__(self, anObject):
+        pass
+
+    @abstractmethod
+    def isEmpty(self):
+        pass
+
+class EmptyNode(Node):
+    def __init__(self, anObject):
+        self.internal_size = 0
+        pass
+
+    def isEmpty(self):
+        return True
+    
+    def value(self):
+        raise Exception(self.STACK_EMPTY_DESCRIPTION)
+
+    def size(self):
+        return self.internal_size
+
+class NonEmptyNode(Node):
+    def __init__(self, anObject, next):
+        self.internal_value = anObject
+        self.next = next
+        self.internal_size = next.internal_size + 1
+    
+    def isEmpty(self):
+        return False
+    
+    def value(self):
+        return self.internal_value
+    
+    def size(self):
+        return self.internal_size
 
 class Stack:
 
     STACK_EMPTY_DESCRIPTION = 'Stack is empty'
 
     def __init__(self):
-        self.internal_stack = []
+        self.internal_stack = EmptyNode(None)
 
     def push(self, anObject):
-        self.internal_stack.append(anObject)
+        new_node = NonEmptyNode(anObject, self.internal_stack)
+        self.internal_stack = new_node
     
     def pop(self):
-        if len(self.internal_stack) > 0:
-            aux = self.internal_stack[-1]
-            self.internal_stack.pop()
-            return aux
-        raise Exception(self.STACK_EMPTY_DESCRIPTION)
+        aux = self.internal_stack.value()
+        self.internal_stack = self.internal_stack.next
+        return aux
     
     def top(self):
-        if len(self.internal_stack) > 0:
-            return self.internal_stack[-1]
-        raise Exception(self.STACK_EMPTY_DESCRIPTION)
+        return self.internal_stack.value()
     
     def isEmpty(self):
-        return len(self.internal_stack) == 0
+        return self.internal_stack.isEmpty()
     
     def size(self):
-        return len(self.internal_stack)
+        return self.internal_stack.internal_size
     
 class StackTest(unittest.TestCase):
     
