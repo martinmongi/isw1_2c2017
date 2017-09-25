@@ -168,22 +168,22 @@ class PortfolioTest < Minitest::Test
     assert(composedPortfolio.transactions.include?(deposit3))
   end
 
-  # def test_16CanNotCreatePortfoliosWithRepeatedAccount
-  #   account1 = ReceptiveAccount.new
-  #   invalidPortfolio = assert_raises Exception do
-  #     Portfolio.create_with(account1,account1)
-  #   end
-  #   assert_equal(Portfolio.ACCOUNT_ALREADY_MANAGED, invalidPortfolio.message)
-  # end
+  def test_16CanNotCreatePortfoliosWithRepeatedAccount
+    account1 = ReceptiveAccount.new
+    invalidPortfolio = assert_raises Exception do
+      Portfolio.create_with(account1,account1)
+    end
+    assert_equal(Portfolio.ACCOUNT_ALREADY_MANAGED, invalidPortfolio.message)
+  end
   
-  # def test_17CanNotCreatePortfoliosWithAccountsManagedByOtherManagedPortfolio
-  #   account1 = ReceptiveAccount.new 
-  #   account2 = ReceptiveAccount.new 
-  #   complexPortfolio = Portfolio.create_with(account1,account2)
-  #   invalidPortfolio = assert_raises Exception do
-  #     Portfolio.create_with(complexPortfolio,account1)
-  #   end
-  #   assert_equal(Portfolio.ACCOUNT_ALREADY_MANAGED, invalidPortfolio.message)
-  # end
+  def test_17CanNotCreatePortfoliosWithAccountsManagedByOtherManagedPortfolio
+    account1 = ReceptiveAccount.new 
+    account2 = ReceptiveAccount.new 
+    complexPortfolio = Portfolio.create_with(account1,account2)
+    invalidPortfolio = assert_raises Exception do
+      Portfolio.create_with(complexPortfolio,account1)
+    end
+    assert_equal(Portfolio.ACCOUNT_ALREADY_MANAGED, invalidPortfolio.message)
+  end
 
 end

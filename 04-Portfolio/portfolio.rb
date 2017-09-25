@@ -42,7 +42,18 @@ class Portfolio < SummarizingAccount
     'Account already managed'
   end
 
+  def transactions
+    transactions = []
+    @accounts.each do |account|
+      transactions.concat(account.transactions)
+    end
+    transactions.clone
+  end
+
   def add_account(account)
-    @accounts << account
+    if (self.manages(account))
+      raise Portfolio.ACCOUNT_ALREADY_MANAGED
+    end
+      @accounts << account
   end
 end
