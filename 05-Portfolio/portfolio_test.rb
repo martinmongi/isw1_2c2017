@@ -233,162 +233,162 @@ class PortfolioTest < Minitest::Test
     assert_equal(100, toAccount.balance)
   end
 
-  def test_19AccountSummaryShouldProvideHumanReadableTransactionsDetail
-    fromAccount = ReceptiveAccount.new
-    toAccount = ReceptiveAccount.new
+  # def test_19AccountSummaryShouldProvideHumanReadableTransactionsDetail
+  #   fromAccount = ReceptiveAccount.new
+  #   toAccount = ReceptiveAccount.new
 
-    Deposit.register_for_on(100,fromAccount)
-    Withdraw.register_for_on(50,fromAccount)
-    Transfer.register(100,fromAccount, toAccount)
+  #   Deposit.register_for_on(100,fromAccount)
+  #   Withdraw.register_for_on(50,fromAccount)
+  #   Transfer.register(100,fromAccount, toAccount)
 
-    lines = Reporter.detail(fromAccount)
+  #   lines = Reporter.detail(fromAccount)
 
-    assert_equal(3,lines.size)
-    assert_equal("Deposito por 100", lines[0])
-    assert_equal("Extraccion por 50", lines[1])
-    assert_equal("Transferencia por -100", lines[2])
-  end
+  #   assert_equal(3,lines.size)
+  #   assert_equal("Deposito por 100", lines[0])
+  #   assert_equal("Extraccion por 50", lines[1])
+  #   assert_equal("Transferencia por -100", lines[2])
+  # end
 
-  def account_summary_lines(fromAccount)
-    self.should_implement
-  end
+  # def account_summary_lines(fromAccount)
+  #   self.should_implement
+  # end
 
-  def test_20ShouldBeAbleToBeQueryTransferNet
-    fromAccount = ReceptiveAccount.new
-    toAccount = ReceptiveAccount.new
+  # def test_20ShouldBeAbleToBeQueryTransferNet
+  #   fromAccount = ReceptiveAccount.new
+  #   toAccount = ReceptiveAccount.new
 
-    Deposit.register_for_on(100,fromAccount)
-    Withdraw.register_for_on(50,fromAccount)
-    Transfer.register(100,fromAccount, toAccount)
-    Transfer.register(250,toAccount, fromAccount)
+  #   Deposit.register_for_on(100,fromAccount)
+  #   Withdraw.register_for_on(50,fromAccount)
+  #   Transfer.register(100,fromAccount, toAccount)
+  #   Transfer.register(250,toAccount, fromAccount)
 
-    assert_equal(150, account_transfer_net(fromAccount))
-    assert_equal(-150, account_transfer_net(toAccount))
-  end
+  #   assert_equal(150, account_transfer_net(fromAccount))
+  #   assert_equal(-150, account_transfer_net(toAccount))
+  # end
 
-  def account_transfer_net(account)
-    self.should_implement
-  end
+  # def account_transfer_net(account)
+  #   self.should_implement
+  # end
 
-  def test_21CertificateOfDepositShouldWithdrawInvestmentValue
-    account = ReceptiveAccount.new
-    toAccount = ReceptiveAccount.new
+  # def test_21CertificateOfDepositShouldWithdrawInvestmentValue
+  #   account = ReceptiveAccount.new
+  #   toAccount = ReceptiveAccount.new
 
-    Deposit.register_for_on(1000,account)
-    Withdraw.register_for_on(50,account)
-    Transfer.register(100,account, toAccount)
-    CertificateOfDeposit.register_for_on(100,30,0.1,account)
+  #   Deposit.register_for_on(1000,account)
+  #   Withdraw.register_for_on(50,account)
+  #   Transfer.register(100,account, toAccount)
+  #   CertificateOfDeposit.register_for_on(100,30,0.1,account)
 
-    assert_equal(100, investment_net(account))
-    assert_equal(750,account.balance)
-  end
+  #   assert_equal(100, investment_net(account))
+  #   assert_equal(750,account.balance)
+  # end
 
-  def investment_net(account)
-    self.should_implement
-  end
+  # def investment_net(account)
+  #   self.should_implement
+  # end
 
-  def test_22ShouldBeAbleToQueryInvestmentEarnings
-    account = ReceptiveAccount.new
+  # def test_22ShouldBeAbleToQueryInvestmentEarnings
+  #   account = ReceptiveAccount.new
 
-    CertificateOfDeposit.register_for_on(100,30,0.1,account)
-    CertificateOfDeposit.register_for_on(100,60,0.15,account)
+  #   CertificateOfDeposit.register_for_on(100,30,0.1,account)
+  #   CertificateOfDeposit.register_for_on(100,60,0.15,account)
 
-    investmentEarnings = 100.0*(0.1/360)*30 + 100.0*(0.15/360)*60
+  #   investmentEarnings = 100.0*(0.1/360)*30 + 100.0*(0.15/360)*60
 
-    assert_equal(investmentEarnings,self.investment_earnings(account))
-  end
+  #   assert_equal(investmentEarnings,self.investment_earnings(account))
+  # end
 
-  def investment_earnings(account)
-    self.should_implement
-  end
+  # def investment_earnings(account)
+  #   self.should_implement
+  # end
 
-  def test_23AccountSummaryShouldWorkWithCertificateOfDeposit
-    fromAccount = ReceptiveAccount.new
-    toAccount = ReceptiveAccount.new
+  # def test_23AccountSummaryShouldWorkWithCertificateOfDeposit
+  #   fromAccount = ReceptiveAccount.new
+  #   toAccount = ReceptiveAccount.new
 
-    Deposit.register_for_on(100,fromAccount)
-    Withdraw.register_for_on(50,fromAccount)
-    Transfer.register(100,fromAccount, toAccount)
-    CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
+  #   Deposit.register_for_on(100,fromAccount)
+  #   Withdraw.register_for_on(50,fromAccount)
+  #   Transfer.register(100,fromAccount, toAccount)
+  #   CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
 
-    lines = self.account_summary_lines(fromAccount)
+  #   lines = self.account_summary_lines(fromAccount)
 
-    assert_equal(4,lines.size)
-    assert_equal("Deposito por 100", lines[0])
-    assert_equal("Extraccion por 50", lines[1])
-    assert_equal("Transferencia por -100", lines[2])
-    assert_equal("Plazo fijo por 1000 durante 30 dias a una tna de 0.1", lines[3])
-  end
+  #   assert_equal(4,lines.size)
+  #   assert_equal("Deposito por 100", lines[0])
+  #   assert_equal("Extraccion por 50", lines[1])
+  #   assert_equal("Transferencia por -100", lines[2])
+  #   assert_equal("Plazo fijo por 1000 durante 30 dias a una tna de 0.1", lines[3])
+  # end
 
-  def test_24ShouldBeAbleToBeQueryTransferNetWithCertificateOfDeposit
-    fromAccount = ReceptiveAccount.new
-    toAccount = ReceptiveAccount.new
+  # def test_24ShouldBeAbleToBeQueryTransferNetWithCertificateOfDeposit
+  #   fromAccount = ReceptiveAccount.new
+  #   toAccount = ReceptiveAccount.new
 
-    Deposit.register_for_on(100,fromAccount)
-    Withdraw.register_for_on(50,fromAccount)
-    Transfer.register(100,fromAccount, toAccount)
-    Transfer.register(250,toAccount, fromAccount)
-    CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
+  #   Deposit.register_for_on(100,fromAccount)
+  #   Withdraw.register_for_on(50,fromAccount)
+  #   Transfer.register(100,fromAccount, toAccount)
+  #   Transfer.register(250,toAccount, fromAccount)
+  #   CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
 
-    assert_equal(150,self.account_transfer_net(fromAccount))
-    assert_equal(-150,self.account_transfer_net(toAccount))
-  end
+  #   assert_equal(150,self.account_transfer_net(fromAccount))
+  #   assert_equal(-150,self.account_transfer_net(toAccount))
+  # end
 
-  def test_25PortfolioTreePrinter
-    account1 = ReceptiveAccount.new
-    account2 = ReceptiveAccount.new
-    account3 = ReceptiveAccount.new
-    complexPortfolio = Portfolio.create_with(account1,account2)
-    composedPortfolio = Portfolio.create_with(complexPortfolio,account3)
+  # def test_25PortfolioTreePrinter
+  #   account1 = ReceptiveAccount.new
+  #   account2 = ReceptiveAccount.new
+  #   account3 = ReceptiveAccount.new
+  #   complexPortfolio = Portfolio.create_with(account1,account2)
+  #   composedPortfolio = Portfolio.create_with(complexPortfolio,account3)
 
-    accountNames = {}
-    accountNames[composedPortfolio] = "composedPortfolio"
-    accountNames[complexPortfolio] = "complexPortfolio"
-    accountNames[account1] = "account1"
-    accountNames[account2] = "account2"
-    accountNames[account3] = "account3"
+  #   accountNames = {}
+  #   accountNames[composedPortfolio] = "composedPortfolio"
+  #   accountNames[complexPortfolio] = "complexPortfolio"
+  #   accountNames[account1] = "account1"
+  #   accountNames[account2] = "account2"
+  #   accountNames[account3] = "account3"
 
-    lines = self.portfolio_tree_of(composedPortfolio,accountNames)
+  #   lines = self.portfolio_tree_of(composedPortfolio,accountNames)
 
-    assert_equal(5, lines.size)
-    assert_equal("composedPortfolio", lines[0])
-    assert_equal(" complexPortfolio", lines[1])
-    assert_equal("  account1", lines[2])
-    assert_equal("  account2", lines[3])
-    assert_equal(" account3", lines[4])
-  end
+  #   assert_equal(5, lines.size)
+  #   assert_equal("composedPortfolio", lines[0])
+  #   assert_equal(" complexPortfolio", lines[1])
+  #   assert_equal("  account1", lines[2])
+  #   assert_equal("  account2", lines[3])
+  #   assert_equal(" account3", lines[4])
+  # end
 
-  def portfolio_tree_of(portfolio,accountNames)
-    self.should_implement
-  end
+  # def portfolio_tree_of(portfolio,accountNames)
+  #   self.should_implement
+  # end
 
-  def test_26ReversePortfolioTreePrinter
-    account1 = ReceptiveAccount.new
-    account2 = ReceptiveAccount.new
-    account3 = ReceptiveAccount.new
-    complexPortfolio = Portfolio.create_with(account1,account2)
-    composedPortfolio = Portfolio.create_with(complexPortfolio,account3)
+  # def test_26ReversePortfolioTreePrinter
+  #   account1 = ReceptiveAccount.new
+  #   account2 = ReceptiveAccount.new
+  #   account3 = ReceptiveAccount.new
+  #   complexPortfolio = Portfolio.create_with(account1,account2)
+  #   composedPortfolio = Portfolio.create_with(complexPortfolio,account3)
 
-    accountNames = {}
-    accountNames[composedPortfolio] = "composedPortfolio"
-    accountNames[complexPortfolio] = "complexPortfolio"
-    accountNames[account1] = "account1"
-    accountNames[account2] = "account2"
-    accountNames[account3] = "account3"
+  #   accountNames = {}
+  #   accountNames[composedPortfolio] = "composedPortfolio"
+  #   accountNames[complexPortfolio] = "complexPortfolio"
+  #   accountNames[account1] = "account1"
+  #   accountNames[account2] = "account2"
+  #   accountNames[account3] = "account3"
 
-    lines = self.reverse_portfolio_tree_of(composedPortfolio, accountNames)
+  #   lines = self.reverse_portfolio_tree_of(composedPortfolio, accountNames)
 
-    assert_equal(5, lines.size)
-    assert_equal(" account3", lines[0])
-    assert_equal("  account2", lines[1])
-    assert_equal("  account1", lines[2])
-    assert_equal(" complexPortfolio", lines[3])
-    assert_equal("composedPortfolio", lines[4])
+  #   assert_equal(5, lines.size)
+  #   assert_equal(" account3", lines[0])
+  #   assert_equal("  account2", lines[1])
+  #   assert_equal("  account1", lines[2])
+  #   assert_equal(" complexPortfolio", lines[3])
+  #   assert_equal("composedPortfolio", lines[4])
 
-  end
+  # end
 
-  def reverse_portfolio_tree_of(portfolio,accountNames)
-    self.should_implement
-  end
+  # def reverse_portfolio_tree_of(portfolio,accountNames)
+  #   self.should_implement
+  # end
 
 end

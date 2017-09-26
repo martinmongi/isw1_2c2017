@@ -2,7 +2,7 @@ require './object'
 
 class Transaction
 
-  def self.register_for_on(amount,account)
+  def self.register_for_on(amount, account)
     transaction = self.new(amount)
     account.register(transaction)
     transaction

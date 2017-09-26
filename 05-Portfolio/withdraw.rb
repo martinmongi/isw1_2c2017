@@ -7,7 +7,7 @@ class Withdraw < Transaction
   end
 
   def affectBalance(balance)
-  	balance - self.value
+  	return balance - self.value
   end
 
   def value

@@ -1,6 +1,6 @@
 require './transaction'
 
-class TransferDeposit < Transaction
+class TransferWithdraw < Transaction
 
   def initialize(value)
     @value = value
@@ -13,7 +13,7 @@ class TransferDeposit < Transaction
   end
 
   def affectBalance(balance)
-  	return balance + self.value
+  	return balance - self.value
   end
 
   def transfer

@@ -1,11 +1,13 @@
 require './transaction'
+require './transfer_deposit'
+require './transfer_withdraw'
 
 class Transfer
 
   def initialize(amount, fromAccount, toAccount)
-    @deposit = TransferDeposit.register_for_on(amount, toAccount, self)
-  	@withdraw = TransferWithdraw.register_for_on(amount, fromAccount, self)
-  	@value = amount
+    @value = amount
+    @deposit = TransferDeposit.register_transfer(self, toAccount)
+  	@withdraw = TransferWithdraw.register_transfer(self, fromAccount)
   end
 
   def self.register(amount, fromAccount, toAccount)
