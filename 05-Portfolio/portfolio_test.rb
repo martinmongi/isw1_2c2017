@@ -4,6 +4,7 @@ require './transfer'
 require './certificate_of_deposit'
 require './receptive_account'
 require './portfolio'
+require './reporter'
 require 'minitest/autorun'
 require 'minitest/reporters'
 
@@ -233,25 +234,21 @@ class PortfolioTest < Minitest::Test
     assert_equal(100, toAccount.balance)
   end
 
-  # def test_19AccountSummaryShouldProvideHumanReadableTransactionsDetail
-  #   fromAccount = ReceptiveAccount.new
-  #   toAccount = ReceptiveAccount.new
+  def test_19AccountSummaryShouldProvideHumanReadableTransactionsDetail
+    fromAccount = ReceptiveAccount.new
+    toAccount = ReceptiveAccount.new
 
-  #   Deposit.register_for_on(100,fromAccount)
-  #   Withdraw.register_for_on(50,fromAccount)
-  #   Transfer.register(100,fromAccount, toAccount)
+    Deposit.register_for_on(100,fromAccount)
+    Withdraw.register_for_on(50,fromAccount)
+    Transfer.register(100,fromAccount, toAccount)
 
-  #   lines = Reporter.detail(fromAccount)
-
-  #   assert_equal(3,lines.size)
-  #   assert_equal("Deposito por 100", lines[0])
-  #   assert_equal("Extraccion por 50", lines[1])
-  #   assert_equal("Transferencia por -100", lines[2])
-  # end
-
-  # def account_summary_lines(fromAccount)
-  #   self.should_implement
-  # end
+    lines = Reporter.detail(fromAccount)
+    puts lines
+    assert_equal(3,lines.size)
+    assert_equal("Deposito por 100", lines[0])
+    assert_equal("Extraccion por 50", lines[1])
+    assert_equal("Transferencia por -100", lines[2])
+  end
 
   # def test_20ShouldBeAbleToBeQueryTransferNet
   #   fromAccount = ReceptiveAccount.new

@@ -10,6 +10,10 @@ class Deposit < Transaction
   	return balance + self.value
   end
 
+  def detail
+    "Deposito por #{@value}"
+  end
+
   def value
     @value
   end

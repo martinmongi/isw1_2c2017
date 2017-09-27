@@ -20,6 +20,10 @@ class TransferDeposit < Transaction
     @transfer
   end
 
+  def detail
+    "Transferencia por #{@value}"
+  end
+
   def value
     @value
   end

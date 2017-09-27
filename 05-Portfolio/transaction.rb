@@ -16,7 +16,7 @@ class Transaction
   	self.should_implement
   end
 
-  def datail()
+  def datail
   	self.should_implement
   end
 

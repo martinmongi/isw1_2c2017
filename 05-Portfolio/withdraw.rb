@@ -9,6 +9,10 @@ class Withdraw < Transaction
   def affectBalance(balance)
   	return balance - self.value
   end
+  
+  def detail
+    "Extraccion por #{@value}"
+  end
 
   def value
     @value

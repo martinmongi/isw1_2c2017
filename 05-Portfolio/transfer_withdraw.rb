@@ -20,6 +20,10 @@ class TransferWithdraw < Transaction
     @transfer
   end
 
+  def detail
+    "Transferencia por -#{@value}"
+  end
+
   def value
     @value
   end
