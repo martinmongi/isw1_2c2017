@@ -14,6 +14,10 @@ class ReceptiveAccount < SummarizingAccount
     @transactions.inject(0) { |balance,transaction | transaction.affectBalance(balance) }
   end
 
+  def balanceTransfer
+    @transactions.inject(0) { |balance,transaction | transaction.affectTransferBalance(balance) }
+  end
+
   def registers(transaction)
     @transactions.include? (transaction)
   end

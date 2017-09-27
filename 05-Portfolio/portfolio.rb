@@ -26,6 +26,10 @@ class Portfolio < SummarizingAccount
     @accounts.inject(0) { |balance,account | balance + account.balance }
   end
 
+  def balanceTransfer
+    @transactions.inject(0) { |balance,account | balance +  transaction.balanceTransfer }
+  end
+
   def registers(transaction)
     @accounts.any? { |account| account.registers(transaction) }
   end

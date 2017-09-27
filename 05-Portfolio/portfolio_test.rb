@@ -243,29 +243,26 @@ class PortfolioTest < Minitest::Test
     Transfer.register(100,fromAccount, toAccount)
 
     lines = Reporter.detail(fromAccount)
-    puts lines
+    
     assert_equal(3,lines.size)
     assert_equal("Deposito por 100", lines[0])
     assert_equal("Extraccion por 50", lines[1])
     assert_equal("Transferencia por -100", lines[2])
   end
 
-  # def test_20ShouldBeAbleToBeQueryTransferNet
-  #   fromAccount = ReceptiveAccount.new
-  #   toAccount = ReceptiveAccount.new
+  def test_20ShouldBeAbleToBeQueryTransferNet
+    fromAccount = ReceptiveAccount.new
+    toAccount = ReceptiveAccount.new
 
-  #   Deposit.register_for_on(100,fromAccount)
-  #   Withdraw.register_for_on(50,fromAccount)
-  #   Transfer.register(100,fromAccount, toAccount)
-  #   Transfer.register(250,toAccount, fromAccount)
+    Deposit.register_for_on(100,fromAccount)
+    Withdraw.register_for_on(50,fromAccount)
+    Transfer.register(100,fromAccount, toAccount)
+    Transfer.register(250,toAccount, fromAccount)
 
-  #   assert_equal(150, account_transfer_net(fromAccount))
-  #   assert_equal(-150, account_transfer_net(toAccount))
-  # end
+    assert_equal(150, fromAccount.balanceTransfer)
+    assert_equal(-150, toAccount.balanceTransfer)
+  end
 
-  # def account_transfer_net(account)
-  #   self.should_implement
-  # end
 
   # def test_21CertificateOfDepositShouldWithdrawInvestmentValue
   #   account = ReceptiveAccount.new

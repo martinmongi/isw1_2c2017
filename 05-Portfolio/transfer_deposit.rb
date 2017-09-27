@@ -16,6 +16,10 @@ class TransferDeposit < Transaction
   	return balance + self.value
   end
 
+  def affectTransferBalance(balance)
+  	balance + @value
+  end
+
   def transfer
     @transfer
   end

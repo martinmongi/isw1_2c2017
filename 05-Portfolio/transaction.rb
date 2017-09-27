@@ -16,6 +16,10 @@ class Transaction
   	self.should_implement
   end
 
+  def affectTransferBalance(balance)
+  	self.should_implement
+  end
+
   def datail
   	self.should_implement
   end
