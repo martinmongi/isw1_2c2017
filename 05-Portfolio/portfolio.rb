@@ -22,6 +22,24 @@ class Portfolio < SummarizingAccount
     @accounts << account
   end
 
+  def account_tree(level, accountNames)
+    name =  " "*level + accountNames[self]
+    @accounts.inject([name]) { |lines, account |
+      lines.concat(account.account_tree(level + 1,accountNames))
+      lines
+    }
+  
+  end
+
+  def reverse_account_tree(level, accountNames)
+    name =  " "*level + accountNames[self]
+    @accounts.inject([name]) { |lines, account |
+      lines.insert(0, *account.reverse_account_tree(level + 1,accountNames))
+      lines
+    }
+  
+  end
+
   def balance
     @accounts.inject(0) { |balance,account | balance + account.balance }
   end

@@ -243,7 +243,7 @@ class PortfolioTest < Minitest::Test
     Transfer.register(100,fromAccount, toAccount)
 
     lines = Reporter.detail(fromAccount)
-    
+
     assert_equal(3,lines.size)
     assert_equal("Deposito por 100", lines[0])
     assert_equal("Extraccion por 50", lines[1])
@@ -328,61 +328,57 @@ class PortfolioTest < Minitest::Test
   #   assert_equal(-150,self.account_transfer_net(toAccount))
   # end
 
-  # def test_25PortfolioTreePrinter
-  #   account1 = ReceptiveAccount.new
-  #   account2 = ReceptiveAccount.new
-  #   account3 = ReceptiveAccount.new
-  #   complexPortfolio = Portfolio.create_with(account1,account2)
-  #   composedPortfolio = Portfolio.create_with(complexPortfolio,account3)
+  def test_25PortfolioTreePrinter
+    account1 = ReceptiveAccount.new
+    account2 = ReceptiveAccount.new
+    account3 = ReceptiveAccount.new
+    complexPortfolio = Portfolio.create_with(account1,account2)
+    composedPortfolio = Portfolio.create_with(complexPortfolio,account3)
 
-  #   accountNames = {}
-  #   accountNames[composedPortfolio] = "composedPortfolio"
-  #   accountNames[complexPortfolio] = "complexPortfolio"
-  #   accountNames[account1] = "account1"
-  #   accountNames[account2] = "account2"
-  #   accountNames[account3] = "account3"
+    accountNames = {}
+    accountNames[composedPortfolio] = "composedPortfolio"
+    accountNames[complexPortfolio] = "complexPortfolio"
+    accountNames[account1] = "account1"
+    accountNames[account2] = "account2"
+    accountNames[account3] = "account3"
+        
+    lines = Reporter.portfolio_tree_of(composedPortfolio, accountNames)
 
-  #   lines = self.portfolio_tree_of(composedPortfolio,accountNames)
+    assert_equal(5, lines.size)
+    assert_equal("composedPortfolio", lines[0])
+    assert_equal(" complexPortfolio", lines[1])
+    assert_equal("  account1", lines[2])
+    assert_equal("  account2", lines[3])
+    assert_equal(" account3", lines[4])
+  end
 
-  #   assert_equal(5, lines.size)
-  #   assert_equal("composedPortfolio", lines[0])
-  #   assert_equal(" complexPortfolio", lines[1])
-  #   assert_equal("  account1", lines[2])
-  #   assert_equal("  account2", lines[3])
-  #   assert_equal(" account3", lines[4])
-  # end
 
-  # def portfolio_tree_of(portfolio,accountNames)
-  #   self.should_implement
-  # end
 
-  # def test_26ReversePortfolioTreePrinter
-  #   account1 = ReceptiveAccount.new
-  #   account2 = ReceptiveAccount.new
-  #   account3 = ReceptiveAccount.new
-  #   complexPortfolio = Portfolio.create_with(account1,account2)
-  #   composedPortfolio = Portfolio.create_with(complexPortfolio,account3)
+  def test_26ReversePortfolioTreePrinter
+    account1 = ReceptiveAccount.new
+    account2 = ReceptiveAccount.new
+    account3 = ReceptiveAccount.new
+    complexPortfolio = Portfolio.create_with(account1,account2)
+    composedPortfolio = Portfolio.create_with(complexPortfolio,account3)
 
-  #   accountNames = {}
-  #   accountNames[composedPortfolio] = "composedPortfolio"
-  #   accountNames[complexPortfolio] = "complexPortfolio"
-  #   accountNames[account1] = "account1"
-  #   accountNames[account2] = "account2"
-  #   accountNames[account3] = "account3"
+    accountNames = {}
+    accountNames[composedPortfolio] = "composedPortfolio"
+    accountNames[complexPortfolio] = "complexPortfolio"
+    accountNames[account1] = "account1"
+    accountNames[account2] = "account2"
+    accountNames[account3] = "account3"
 
-  #   lines = self.reverse_portfolio_tree_of(composedPortfolio, accountNames)
+    lines = Reporter.reverse_portfolio_tree_of(composedPortfolio, accountNames)
 
-  #   assert_equal(5, lines.size)
-  #   assert_equal(" account3", lines[0])
-  #   assert_equal("  account2", lines[1])
-  #   assert_equal("  account1", lines[2])
-  #   assert_equal(" complexPortfolio", lines[3])
-  #   assert_equal("composedPortfolio", lines[4])
+    assert_equal(5, lines.size)
+    assert_equal(" account3", lines[0])
+    assert_equal("  account2", lines[1])
+    assert_equal("  account1", lines[2])
+    assert_equal(" complexPortfolio", lines[3])
+    assert_equal("composedPortfolio", lines[4])
 
-  # end
+  end
 
-  # def reverse_portfolio_tree_of(portfolio,accountNames)
-  #   self.should_implement
-  # end
+
 
 end

@@ -14,6 +14,16 @@ class ReceptiveAccount < SummarizingAccount
     @transactions.inject(0) { |balance,transaction | transaction.affectBalance(balance) }
   end
 
+  def account_tree(level, accountNames)
+    name =  " "*level + accountNames[self]
+    [name]
+  end
+
+  def reverse_account_tree(level, accountNames)
+    name =  " "*level + accountNames[self]
+    [name]
+  end
+
   def balanceTransfer
     @transactions.inject(0) { |balance,transaction | transaction.affectTransferBalance(balance) }
   end

@@ -16,4 +16,5 @@ class SummarizingAccount
   def transactions
     self.should_implement
   end
+
 end
