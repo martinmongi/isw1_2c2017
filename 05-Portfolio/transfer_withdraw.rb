@@ -32,5 +32,9 @@ class TransferWithdraw < Transaction
     @value
   end
 
+  def transferNet
+    - @value
+  end
+
 end
 

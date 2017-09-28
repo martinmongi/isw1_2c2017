@@ -264,69 +264,77 @@ class PortfolioTest < Minitest::Test
   end
 
 
-  # def test_21CertificateOfDepositShouldWithdrawInvestmentValue
-  #   account = ReceptiveAccount.new
-  #   toAccount = ReceptiveAccount.new
+  def test_21CertificateOfDepositShouldWithdrawInvestmentValue
+    account = ReceptiveAccount.new
+    toAccount = ReceptiveAccount.new
 
-  #   Deposit.register_for_on(1000,account)
-  #   Withdraw.register_for_on(50,account)
-  #   Transfer.register(100,account, toAccount)
-  #   CertificateOfDeposit.register_for_on(100,30,0.1,account)
+    Deposit.register_for_on(1000,account)
+    Withdraw.register_for_on(50,account)
+    Transfer.register(100,account, toAccount)
+    CertificateOfDeposit.register_for_on(100,30,0.1,account)
 
-  #   assert_equal(100, investment_net(account))
-  #   assert_equal(750,account.balance)
-  # end
+    assert_equal(100, investment_net(account))
+    assert_equal(750,account.balance)
+  end
 
-  # def investment_net(account)
-  #   self.should_implement
-  # end
+  def investment_net(account)
+    account.transactions.inject(0) { |sum, transaction | sum + transaction.investmentValue }
+  end
 
-  # def test_22ShouldBeAbleToQueryInvestmentEarnings
-  #   account = ReceptiveAccount.new
+  def test_22ShouldBeAbleToQueryInvestmentEarnings
+    account = ReceptiveAccount.new
 
-  #   CertificateOfDeposit.register_for_on(100,30,0.1,account)
-  #   CertificateOfDeposit.register_for_on(100,60,0.15,account)
+    CertificateOfDeposit.register_for_on(100,30,0.1,account)
+    CertificateOfDeposit.register_for_on(100,60,0.15,account)
 
-  #   investmentEarnings = 100.0*(0.1/360)*30 + 100.0*(0.15/360)*60
+    investmentEarnings = 100.0*(0.1/360)*30 + 100.0*(0.15/360)*60
 
-  #   assert_equal(investmentEarnings,self.investment_earnings(account))
-  # end
+    assert_equal(investmentEarnings,self.investment_earnings(account))
+  end
 
-  # def investment_earnings(account)
-  #   self.should_implement
-  # end
+  def investment_earnings(account)
+    account.transactions.inject(0) { |sum, transaction | sum + transaction.investmentEarnings }
+  end
 
-  # def test_23AccountSummaryShouldWorkWithCertificateOfDeposit
-  #   fromAccount = ReceptiveAccount.new
-  #   toAccount = ReceptiveAccount.new
+  def test_23AccountSummaryShouldWorkWithCertificateOfDeposit
+    fromAccount = ReceptiveAccount.new
+    toAccount = ReceptiveAccount.new
 
-  #   Deposit.register_for_on(100,fromAccount)
-  #   Withdraw.register_for_on(50,fromAccount)
-  #   Transfer.register(100,fromAccount, toAccount)
-  #   CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
+    Deposit.register_for_on(100,fromAccount)
+    Withdraw.register_for_on(50,fromAccount)
+    Transfer.register(100,fromAccount, toAccount)
+    CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
 
-  #   lines = self.account_summary_lines(fromAccount)
+    lines = self.account_summary_lines(fromAccount)
 
-  #   assert_equal(4,lines.size)
-  #   assert_equal("Deposito por 100", lines[0])
-  #   assert_equal("Extraccion por 50", lines[1])
-  #   assert_equal("Transferencia por -100", lines[2])
-  #   assert_equal("Plazo fijo por 1000 durante 30 dias a una tna de 0.1", lines[3])
-  # end
+    assert_equal(4,lines.size)
+    assert_equal("Deposito por 100", lines[0])
+    assert_equal("Extraccion por 50", lines[1])
+    assert_equal("Transferencia por -100", lines[2])
+    assert_equal("Plazo fijo por 1000 durante 30 dias a una tna de 0.1", lines[3])
+  end
 
-  # def test_24ShouldBeAbleToBeQueryTransferNetWithCertificateOfDeposit
-  #   fromAccount = ReceptiveAccount.new
-  #   toAccount = ReceptiveAccount.new
+  def account_summary_lines(account)
+    account.transactions.map {|transaction| transaction.detail}
+  end
 
-  #   Deposit.register_for_on(100,fromAccount)
-  #   Withdraw.register_for_on(50,fromAccount)
-  #   Transfer.register(100,fromAccount, toAccount)
-  #   Transfer.register(250,toAccount, fromAccount)
-  #   CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
+  def test_24ShouldBeAbleToBeQueryTransferNetWithCertificateOfDeposit
+    fromAccount = ReceptiveAccount.new
+    toAccount = ReceptiveAccount.new
 
-  #   assert_equal(150,self.account_transfer_net(fromAccount))
-  #   assert_equal(-150,self.account_transfer_net(toAccount))
-  # end
+    Deposit.register_for_on(100,fromAccount)
+    Withdraw.register_for_on(50,fromAccount)
+    Transfer.register(100,fromAccount, toAccount)
+    Transfer.register(250,toAccount, fromAccount)
+    CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
+
+    assert_equal(150,self.account_transfer_net(fromAccount))
+    assert_equal(-150,self.account_transfer_net(toAccount))
+  end
+
+  def account_transfer_net(account)
+    account.transactions.inject(0) { |sum, transaction | sum + transaction.transferNet }
+  end
 
   def test_25PortfolioTreePrinter
     account1 = ReceptiveAccount.new

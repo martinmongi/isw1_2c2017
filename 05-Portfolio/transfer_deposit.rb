@@ -32,5 +32,9 @@ class TransferDeposit < Transaction
     @value
   end
 
+  def transferNet
+    @value
+  end
+
 end
 

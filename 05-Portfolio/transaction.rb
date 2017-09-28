@@ -24,5 +24,16 @@ class Transaction
   	self.should_implement
   end
 
+  def investmentValue
+    0
+  end
 
+  def investmentEarnings
+    0
+  end
+
+  def transferNet
+    0
+  end
+  
 end
