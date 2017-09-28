@@ -3,7 +3,7 @@ require './transaction'
 class CertificateOfDeposit < Transaction
 
   def initialize(capital,days,tna)
-    @capital = capital
+    @value = capital
     @days = days
     @tna = tna
   end
@@ -15,19 +15,19 @@ class CertificateOfDeposit < Transaction
   end
 
   def affectBalance(balance)
-  	balance - @capital
+  	balance - @value
   end
 
   def investmentValue
-    @capital
+    @value
   end
 
   def investmentEarnings
-    @capital*(@tna/360)*@days
+    @value*(@tna/360)*@days
   end
 
   def detail
-    "Plazo fijo por #{@capital} durante #{@days} dias a una tna de #{@tna}"
+    "Plazo fijo por #{@value} durante #{@days} dias a una tna de #{@tna}"
   end
 
 end

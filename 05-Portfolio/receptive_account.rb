@@ -10,8 +10,13 @@ class ReceptiveAccount < SummarizingAccount
     @transactions << transaction
   end
 
+  def queryTransactions(&block)
+    block.call(@transactions)
+  end
+
   def balance
-    @transactions.inject(0) { |balance,transaction | transaction.affectBalance(balance) }
+    process = Proc.new {|transactions| @transactions.inject(0) { | balance, transaction | transaction.affectBalance(balance)}}
+    self.queryTransactions(&process)
   end
 
   def account_tree(level, accountNames)
@@ -22,10 +27,6 @@ class ReceptiveAccount < SummarizingAccount
   def reverse_account_tree(level, accountNames)
     name =  " "*level + accountNames[self]
     [name]
-  end
-
-  def balanceTransfer
-    @transactions.inject(0) { |balance,transaction | transaction.affectTransferBalance(balance) }
   end
 
   def registers(transaction)

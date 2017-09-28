@@ -5,6 +5,7 @@ require './certificate_of_deposit'
 require './receptive_account'
 require './portfolio'
 require './reporter'
+require './account_querier'
 require 'minitest/autorun'
 require 'minitest/reporters'
 
@@ -253,59 +254,54 @@ class PortfolioTest < Minitest::Test
   def test_20ShouldBeAbleToBeQueryTransferNet
     fromAccount = ReceptiveAccount.new
     toAccount = ReceptiveAccount.new
+    querier = AccountQuerier.new
 
     Deposit.register_for_on(100,fromAccount)
     Withdraw.register_for_on(50,fromAccount)
     Transfer.register(100,fromAccount, toAccount)
     Transfer.register(250,toAccount, fromAccount)
 
-    assert_equal(150, fromAccount.balanceTransfer)
-    assert_equal(-150, toAccount.balanceTransfer)
+    assert_equal(150, querier.balanceTransfer(fromAccount))
+    assert_equal(-150, querier.balanceTransfer(toAccount))
   end
-
 
   def test_21CertificateOfDepositShouldWithdrawInvestmentValue
     account = ReceptiveAccount.new
     toAccount = ReceptiveAccount.new
+    querier = AccountQuerier.new
 
     Deposit.register_for_on(1000,account)
     Withdraw.register_for_on(50,account)
     Transfer.register(100,account, toAccount)
     CertificateOfDeposit.register_for_on(100,30,0.1,account)
 
-    assert_equal(100, investment_net(account))
-    assert_equal(750,account.balance)
-  end
-
-  def investment_net(account)
-    account.transactions.inject(0) { |sum, transaction | sum + transaction.investmentValue }
+    assert_equal(100, querier.investmentNet(account))
+    assert_equal(750, account.balance)
   end
 
   def test_22ShouldBeAbleToQueryInvestmentEarnings
     account = ReceptiveAccount.new
+    querier = AccountQuerier.new
 
     CertificateOfDeposit.register_for_on(100,30,0.1,account)
     CertificateOfDeposit.register_for_on(100,60,0.15,account)
 
     investmentEarnings = 100.0*(0.1/360)*30 + 100.0*(0.15/360)*60
 
-    assert_equal(investmentEarnings,self.investment_earnings(account))
-  end
-
-  def investment_earnings(account)
-    account.transactions.inject(0) { |sum, transaction | sum + transaction.investmentEarnings }
+    assert_equal(investmentEarnings,querier.investmentEarnings(account))
   end
 
   def test_23AccountSummaryShouldWorkWithCertificateOfDeposit
     fromAccount = ReceptiveAccount.new
     toAccount = ReceptiveAccount.new
+    querier = AccountQuerier.new
 
     Deposit.register_for_on(100,fromAccount)
     Withdraw.register_for_on(50,fromAccount)
     Transfer.register(100,fromAccount, toAccount)
     CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
 
-    lines = self.account_summary_lines(fromAccount)
+    lines = querier.accountSummaryLines(fromAccount)
 
     assert_equal(4,lines.size)
     assert_equal("Deposito por 100", lines[0])
@@ -314,13 +310,10 @@ class PortfolioTest < Minitest::Test
     assert_equal("Plazo fijo por 1000 durante 30 dias a una tna de 0.1", lines[3])
   end
 
-  def account_summary_lines(account)
-    account.transactions.map {|transaction| transaction.detail}
-  end
-
   def test_24ShouldBeAbleToBeQueryTransferNetWithCertificateOfDeposit
     fromAccount = ReceptiveAccount.new
     toAccount = ReceptiveAccount.new
+    querier = AccountQuerier.new
 
     Deposit.register_for_on(100,fromAccount)
     Withdraw.register_for_on(50,fromAccount)
@@ -328,12 +321,8 @@ class PortfolioTest < Minitest::Test
     Transfer.register(250,toAccount, fromAccount)
     CertificateOfDeposit.register_for_on(1000, 30, 0.1, fromAccount)
 
-    assert_equal(150,self.account_transfer_net(fromAccount))
-    assert_equal(-150,self.account_transfer_net(toAccount))
-  end
-
-  def account_transfer_net(account)
-    account.transactions.inject(0) { |sum, transaction | sum + transaction.transferNet }
+    assert_equal(150,querier.accountNetTransfer(fromAccount))
+    assert_equal(-150,querier.accountNetTransfer(toAccount))
   end
 
   def test_25PortfolioTreePrinter
@@ -360,8 +349,6 @@ class PortfolioTest < Minitest::Test
     assert_equal(" account3", lines[4])
   end
 
-
-
   def test_26ReversePortfolioTreePrinter
     account1 = ReceptiveAccount.new
     account2 = ReceptiveAccount.new
@@ -386,7 +373,5 @@ class PortfolioTest < Minitest::Test
     assert_equal("composedPortfolio", lines[4])
 
   end
-
-
-
+  
 end
