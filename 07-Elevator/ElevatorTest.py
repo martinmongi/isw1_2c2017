@@ -1,4 +1,3 @@
-#
 # Developed by 10Pines SRL
 # License: 
 # This work is licensed under the 
@@ -14,7 +13,6 @@ floorToGoStack = []
 class ElevatorState(Enum):
     IDLE = 1
     WORKING = 2
-
 
 class CabinState(Enum):
     STOPPED = 1
@@ -104,12 +102,9 @@ class ElevatorController:
         if not self.isIdle() and not self.isCabinDoorClosed() and not self.isCabinDoorOpening():
             self.cabin_door_state = CabinDoorState.CLOSING
 
-
-
-
-
 class ElevatorEmergency(Exception):
-    pass
+    def __init__(self, message):
+        self.message = message
 
 class ElevatorTest(unittest.TestCase):
 
@@ -371,7 +366,7 @@ class ElevatorTest(unittest.TestCase):
             elevatorController.cabinOnFloor(3)
             self.fail()
         except ElevatorEmergency as elevatorEmergency:
-            print elevatorEmergency.message
+            print(elevatorEmergency.message)
             self.assertTrue (elevatorEmergency.message == "Sensor de cabina desincronizado")
         
     def test19ElevatorHasToEnterEmergencyIfDoorClosesAutomatically(self):
