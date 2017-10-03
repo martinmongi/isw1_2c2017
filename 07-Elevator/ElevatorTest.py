@@ -93,10 +93,8 @@ class ElevatorController:
         self.cabin_door_state = CabinDoorState.CLOSING
     
     def openCabinDoor(self):
-        if self.isWorking() and not self.isCabinMoving():
+        if not self.isWorking() and not self.isCabinDoorOpened() or self.isCabinDoorClosing():
             self.cabin_door_state = CabinDoorState.OPENING
-        elif not self.isCabinMoving():
-            self.cabin_door_state = CabinDoorState.OPENED
 
     def closeCabinDoor(self):
         if not self.isIdle() and not self.isCabinDoorClosed() and not self.isCabinDoorOpening():
