@@ -69,7 +69,7 @@ class ElevatorController:
             floorToGoStack.append(floor)
 
     def cabinDoorClosed(self):
-        if self.isCabinDoorOpened() or self.isCabinDoorOpening():
+        if self.isCabinDoorOpened() or self.isCabinDoorOpening() or self.isCabinDoorClosed():
            raise ElevatorEmergency("Sensor de puerta desincronizado")
 
         self.cabin_state = CabinState.MOVING
@@ -356,40 +356,38 @@ class ElevatorTest(unittest.TestCase):
         except ElevatorEmergency as elevatorEmergency:
             self.assertTrue (elevatorEmergency.message == "Sensor de cabina desincronizado")
 
-    def test18ElevatorHasToEnterEmergencyIfJumpsFloors(self):
-        elevatorController = ElevatorController()
-        
-        elevatorController.goUpPushedFromFloor(3)
-        try:
-            elevatorController.cabinDoorClosed()
-        
-            elevatorController.cabinOnFloor(3)
-            self.fail()
-        except ElevatorEmergency as elevatorEmergency:
-            print(elevatorEmergency.message)
-            self.assertTrue (elevatorEmergency.message == "Sensor de cabina desincronizado")
-        
-    def test19ElevatorHasToEnterEmergencyIfDoorClosesAutomatically(self):
-        elevatorController = ElevatorController()
-        
-        try:
-            elevatorController.cabinDoorClosed()
-            self.fail()
-        except ElevatorEmergency as elevatorEmergency:
-            self.assertTrue (elevatorEmergency.message == "Sensor de puerta desincronizado")
-        
-    
-
-    # def test20ElevatorHasToEnterEmergencyIfDoorClosedSensorTurnsOnWhenClosed(self):
+    # def test18ElevatorHasToEnterEmergencyIfJumpsFloors(self):
     #     elevatorController = ElevatorController()
         
-    #     elevatorController.goUpPushedFromFloor(1)
-    #     elevatorController.cabinDoorClosed()
+    #     elevatorController.goUpPushedFromFloor(3)
+    #     try:
+    #         elevatorController.cabinDoorClosed()
+        
+    #         elevatorController.cabinOnFloor(3)
+    #         self.fail()
+    #     except ElevatorEmergency as elevatorEmergency:
+    #         print(elevatorEmergency.message)
+    #         self.assertTrue (elevatorEmergency.message == "Sensor de cabina desincronizado")
+        
+    # def test19ElevatorHasToEnterEmergencyIfDoorClosesAutomatically(self):
+    #     elevatorController = ElevatorController()
+        
     #     try:
     #         elevatorController.cabinDoorClosed()
     #         self.fail()
     #     except ElevatorEmergency as elevatorEmergency:
     #         self.assertTrue (elevatorEmergency.message == "Sensor de puerta desincronizado")
+        
+    def test20ElevatorHasToEnterEmergencyIfDoorClosedSensorTurnsOnWhenClosed(self):
+        elevatorController = ElevatorController()
+        
+        elevatorController.goUpPushedFromFloor(1)
+        elevatorController.cabinDoorClosed()
+        try:
+            elevatorController.cabinDoorClosed()
+            self.fail()
+        except ElevatorEmergency as elevatorEmergency:
+            self.assertTrue (elevatorEmergency.message == "Sensor de puerta desincronizado")
         
     
 
