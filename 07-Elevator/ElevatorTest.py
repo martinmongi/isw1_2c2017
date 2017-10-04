@@ -93,11 +93,11 @@ class ElevatorController:
         self.cabin_door_state = CabinDoorState.CLOSING
     
     def openCabinDoor(self):
-        if not self.isWorking() and not self.isCabinDoorOpened() or self.isCabinDoorClosing():
+        if self.isCabinStopped() and not self.isCabinDoorOpened() or self.isCabinDoorClosing():
             self.cabin_door_state = CabinDoorState.OPENING
 
     def closeCabinDoor(self):
-        if not self.isIdle() and not self.isCabinDoorClosed() and not self.isCabinDoorOpening():
+        if self.isWorking() and not self.isCabinDoorClosed() and not self.isCabinDoorOpening():
             self.cabin_door_state = CabinDoorState.CLOSING
 
 class ElevatorEmergency(Exception):
