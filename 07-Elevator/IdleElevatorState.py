@@ -1,5 +1,6 @@
 from ElevatorState import ElevatorState
 
 class IdleElevatorState(ElevatorState):
-    def openCabinDoor(self):
-        print 'openDoor'
+    
+    def goUpPushedFromFloor(self, floor):
+        print "go"

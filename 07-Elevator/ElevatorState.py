@@ -1,5 +1,5 @@
-from State import State
 
-class ElevatorState(State):
+
+class ElevatorState():
     def openCabinDoor(self):
         print 'openDoor'
