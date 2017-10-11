@@ -33,41 +33,42 @@ class ElevatorController:
         self.floorToGoStack = []
     
     def isIdle(self):
-        return isinstance(self.context.getElevatorState(), IdleElevatorState)
+        return isinstance(self.context.state, IdleElevatorState)
     
     def isWorking(self):
-        return isinstance(self.context.getElevatorState(), WorkingElevatorState)
+        return isinstance(self.context.state, WorkingElevatorState)
     
     def isCabinStopped(self):
-        return isinstance(self.context.getCabinState(), StoppedCabinState)
+        return isinstance(self.context.cabin_state, StoppedCabinState)
     
     def isCabinMoving(self):
-        return isinstance(self.context.getCabinState(), MovingCabinState)
+        return isinstance(self.context.cabin_state, MovingCabinState)
 
     def isCabinWaitingForPeople(self):
         return self.isCabinStopped()
     
     def isCabinDoorOpened(self):
-        return isinstance(self.context.getCabinDoorState(), OpenedCabinDoorState)
+        return isinstance(self.context.cabin_door_state, OpenedCabinDoorState)
     
     def isCabinDoorOpening(self):
-        return isinstance(self.context.getCabinDoorState(), OpeningCabinDoorState)
+        return isinstance(self.context.cabin_door_state, OpeningCabinDoorState)
 
     def isCabinDoorClosing(self):
-        return isinstance(self.context.getCabinDoorState(), ClosingCabinDoorState)
+        return isinstance(self.context.cabin_door_state, ClosingCabinDoorState)
     
     def isCabinDoorClosed(self):
-        return isinstance(self.context.getCabinDoorState(), ClosedCabinDoorState)
+        return isinstance(self.context.cabin_door_state, ClosedCabinDoorState)
 
     def cabinFloorNumber(self):
         return self.cabin_floor_number
 
-    # def goUpPushedFromFloor(self, floor):
-    #     if self.isIdle():
-    #         self.state = WorkingElevatorState()
-    #         self.cabin_door_state = ClosingCabinDoorState()
-    #     else :
-    #         self.floorToGoStack.append(floor)
+    def goUpPushedFromFloor(self, floor):
+        self.context.state.goUpPushedFromFloor(floor);
+        # if self.isIdle():
+        #     self.state = WorkingElevatorState()
+        #     self.cabin_door_state = ClosingCabinDoorState()
+        # else :
+        #     self.floorToGoStack.append(floor)
 
     # def cabinDoorClosed(self):
     #     if self.isCabinDoorOpened() or self.isCabinDoorOpening() or self.isCabinDoorClosed():
@@ -116,21 +117,21 @@ class ElevatorTest(unittest.TestCase):
         self.assertTrue(elevatorController.isCabinDoorOpened())
         self.assertEqual(0,elevatorController.cabinFloorNumber())
     
-    # def test02CabinDoorStartsClosingWhenElevatorGetsCalled(self):
-    #     elevatorController = ElevatorController()
+    def test02CabinDoorStartsClosingWhenElevatorGetsCalled(self):
+        elevatorController = ElevatorController()
     
-    #     elevatorController.goUpPushedFromFloor(1)
+        elevatorController.goUpPushedFromFloor(1)
         
-    #     self.assertFalse(elevatorController.isIdle())
-    #     self.assertTrue(elevatorController.isWorking())
+        self.assertFalse(elevatorController.isIdle())
+        self.assertTrue(elevatorController.isWorking())
         
-    #     self.assertTrue(elevatorController.isCabinStopped())
-    #     self.assertFalse(elevatorController.isCabinMoving())
+        self.assertTrue(elevatorController.isCabinStopped())
+        self.assertFalse(elevatorController.isCabinMoving())
         
-    #     self.assertFalse(elevatorController.isCabinDoorOpened())
-    #     self.assertFalse(elevatorController.isCabinDoorOpening())
-    #     self.assertTrue(elevatorController.isCabinDoorClosing())
-    #     self.assertFalse(elevatorController.isCabinDoorClosed())
+        self.assertFalse(elevatorController.isCabinDoorOpened())
+        self.assertFalse(elevatorController.isCabinDoorOpening())
+        self.assertTrue(elevatorController.isCabinDoorClosing())
+        self.assertFalse(elevatorController.isCabinDoorClosed())
     
     # def test03CabinStartsMovingWhenDoorGetsClosed(self):
     #     elevatorController = ElevatorController()
