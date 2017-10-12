@@ -31,7 +31,7 @@ class CabinState():
     
     def __init__(self, context):
         self.context = context
-        self.cabin_floor_number = 0
+
 
     def openCabinDoorWhenDoorIsOpened(self):
         pass
@@ -44,10 +44,10 @@ class StoppedCabinState(CabinState):
 class MovingCabinState(CabinState):
 
     def cabinOnFloor(self, floor):       
-        if  abs(self.context.cabin_state.cabin_floor_number - floor) > 1 :
+        if  abs(self.context.cabin_floor_number - floor) > 1 :
             raise ElevatorEmergency("Sensor de cabina desincronizado")
         self.context.cabin_state = StoppedCabinState(self.context)
-        self.context.cabin_state.cabin_floor_number = floor
+        self.context.cabin_floor_number = floor
         self.context.cabin_door_state = OpeningCabinDoorState(self.context)
 
 class CabinDoorState():
@@ -83,6 +83,7 @@ class ContextStates():
         self.state = IdleElevatorState(self)
         self.cabin_state = StoppedCabinState(self)
         self.floorToGoStack = []
+        self.cabin_floor_number = 0
 class ElevatorController:
     
     def __init__(self):
@@ -115,7 +116,7 @@ class ElevatorController:
         return isinstance(self.context.cabin_door_state, ClosedCabinDoorState)
 
     def cabinFloorNumber(self):
-        return self.context.cabin_state.cabin_floor_number
+        return self.context.cabin_floor_number
 
     def goUpPushedFromFloor(self, floor):
         self.context.state.goUpPushedFromFloor(floor)
