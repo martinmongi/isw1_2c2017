@@ -120,29 +120,12 @@ class ElevatorController:
 
     def goUpPushedFromFloor(self, floor):
         self.context.state.goUpPushedFromFloor(floor)
-        # if self.isIdle():
-        #     self.state = WorkingElevatorState()
-        #     self.cabin_door_state = ClosingCabinDoorState()
-        # else :
-        #     self.floorToGoStack.append(floor)
 
     def cabinDoorClosed(self):
         self.context.cabin_door_state.cabinDoorClosed()
-
-        # if self.isCabinDoorOpened() or self.isCabinDoorOpening() or self.isCabinDoorClosed():
-        #    raise ElevatorEmergency("Sensor de puerta desincronizado")
-
-        # self.cabin_state = MovingCabinState()
-        # self.cabin_door_state = ClosedCabinDoorState()
         
     def cabinOnFloor(self, floor):
         self.context.cabin_state.cabinOnFloor(floor)
-
-        # if self.isCabinStopped() or abs(self.cabinFloorNumber() - floor) > 1 :
-        #    raise ElevatorEmergency("Sensor de cabina desincronizado")
-        # self.context.cabin_state = StoppedCabinState(self.context)
-        # self.context.cabin_door_state = OpeningCabinDoorState(self.context)
-        # self.context.cabin_floor_number = floor
 
     def cabinDoorOpened(self):
         self.context.cabin_door_state = OpenedCabinDoorState(self.context)
@@ -156,13 +139,11 @@ class ElevatorController:
     
     def openCabinDoor(self):
         self.context.cabin_door_state.openCabinDoor()
-        # if self.isCabinStopped() and not self.isCabinDoorOpened() or self.isCabinDoorClosing(): 
-        #     self.context.cabin_door_state = OpeningCabinDoorState(self.context)
+
 
     def closeCabinDoor(self):
         self.context.cabin_door_state.closeCabinDoor()
-        # if self.isWorking() and not self.isCabinDoorClosed() and not self.isCabinDoorOpening():
-        #     self.context.cabin_door_state = ClosingCabinDoorState(self.context)
+
 
 class ElevatorEmergency(Exception):
     def __init__(self, message):
