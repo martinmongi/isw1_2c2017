@@ -8,7 +8,7 @@
 # California, 94041, USA.
 #  
 import unittest
-from elevator.ElevatorController import ElevatorController, ElevatorEmergency
+from ElevatorController import ElevatorController, ElevatorEmergency
 
 class ElevatorTest(unittest.TestCase):
 
@@ -389,6 +389,8 @@ class ElevatorTest(unittest.TestCase):
         self.assertTrue(elevatorController.isWorking())
         self.assertTrue(elevatorController.isCabinStopped())
         self.assertTrue(elevatorController.isCabinDoorClosing())
-    
+
+if __name__ == "__main__":
+    unittest.main()
 
 

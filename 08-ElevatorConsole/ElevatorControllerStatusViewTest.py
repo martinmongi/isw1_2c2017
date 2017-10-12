@@ -8,7 +8,7 @@
 # California, 94041, USA.
 #  
 import unittest
-from elevator.ElevatorController import ElevatorController
+from ElevatorController import ElevatorController
             
 class ElevatorControllerConsole:
     def __init__(self,elevatorController):
@@ -86,6 +86,7 @@ class ElevatorControllerViewTest(unittest.TestCase):
         self.assertEquals("Stopped",elevatorControllerStatusView.cabinStateFieldModel())
         self.assertEquals("Opening",elevatorControllerStatusView.cabinDoorStateFieldModel())
     
-
+if __name__ == "__main__":
+    unittest.main()
 
 
