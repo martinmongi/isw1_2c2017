@@ -8,116 +8,142 @@
 #  
 import unittest
 
-from State import State
+class ElevatorState():
 
-from CabinState import CabinState
-from CabinDoorState import CabinDoorState
-from ElevatorState import ElevatorState
-
-from StoppedCabinState import StoppedCabinState
-from MovingCabinState import MovingCabinState
-
-from IdleElevatorState import IdleElevatorState
-from WorkingElevatorState import WorkingElevatorState
-
-from OpenedCabinDoorState import OpenedCabinDoorState
-from ClosedCabinDoorState import ClosedCabinDoorState
-from OpeningCabinDoorState import OpeningCabinDoorState
-from ClosingCabinDoorState import ClosingCabinDoorState
-
-
-from enum import Enum
-
-floorToGoStack = []
-class ElevatorState(Enum):
-    IDLE = 1
-    WORKING = 2
-
-class CabinState(Enum):
-    STOPPED = 1
-    MOVING = 2
-
-class CabinDoorState(Enum):
-    OPENED = 1
-    OPENING = 2
-    CLOSING = 3
-    CLOSED = 4
-
-class ElevatorController:
-    def __init__(self):
-        self.state = ElevatorState.IDLE
-        self.cabin_state = CabinState.STOPPED
-        self.cabin_door_state = CabinDoorState.OPENED
-        self.cabin_floor_number = 0
+    def __init__(self, context):
+        self.context = context
+    def goUpPushedFromFloor(self, floor):
+        pass
+    def closeCabinDoorWhenDoorisOponed(self):
+        pass
+class IdleElevatorState(ElevatorState):
     
+    def goUpPushedFromFloor(self, floor):
+        self.context.state = WorkingElevatorState(self.context)
+        self.context.cabin_door_state = ClosingCabinDoorState(self.context)
+
+class WorkingElevatorState(ElevatorState):
+    def goUpPushedFromFloor(self, floor):
+        self.context.floorToGoStack.append(floor)
+    def closeCabinDoorWhenDoorisOponed(self):
+        self.context.cabin_door_state = ClosingCabinDoorState(self.context)
+class CabinState():
+    
+    def __init__(self, context):
+        self.context = context
+
+
+    def openCabinDoorWhenDoorIsOpened(self):
+        pass
+class StoppedCabinState(CabinState):
+    def cabinOnFloor(self, floor):
+       raise ElevatorEmergency("Sensor de cabina desincronizado")
+    def openCabinDoorWhenDoorIsOpened():
+        self.context.cabin_door_state = OpeningCabinDoorState(self.context)
+
+class MovingCabinState(CabinState):
+
+    def cabinOnFloor(self, floor):       
+        if  abs(self.context.cabin_floor_number - floor) > 1 :
+            raise ElevatorEmergency("Sensor de cabina desincronizado")
+        self.context.cabin_state = StoppedCabinState(self.context)
+        self.context.cabin_floor_number = floor
+        self.context.cabin_door_state = OpeningCabinDoorState(self.context)
+
+class CabinDoorState():
+
+    def __init__(self, context):
+        self.context = context
+    def openCabinDoor(self):
+        pass
+    def closeCabinDoor(self):
+        pass
+class OpeningCabinDoorState(CabinDoorState):
+    def cabinDoorClosed(self):
+        raise ElevatorEmergency("Sensor de puerta desincronizado")
+class OpenedCabinDoorState(CabinDoorState):
+    def cabinDoorClosed(self):
+        raise ElevatorEmergency("Sensor de puerta desincronizado")
+    def closeCabinDoor(self):
+        self.context.state.closeCabinDoorWhenDoorisOponed()
+class ClosingCabinDoorState(CabinDoorState):
+    def cabinDoorClosed(self):
+        self.context.cabin_state = MovingCabinState(self.context)
+        self.context.cabin_door_state = ClosedCabinDoorState(self.context)
+    def openCabinDoor(self):
+        self.context.cabin_door_state = OpeningCabinDoorState(self.context)
+class ClosedCabinDoorState(CabinDoorState):
+    def cabinDoorClosed(self):
+        raise ElevatorEmergency("Sensor de puerta desincronizado")
+    def openCabinDoor(self):
+        self.context.cabin_state.openCabinDoorWhenDoorIsOpened()
+class ContextStates():
+    def __init__(self):
+        self.cabin_door_state = OpenedCabinDoorState(self)
+        self.state = IdleElevatorState(self)
+        self.cabin_state = StoppedCabinState(self)
+        self.floorToGoStack = []
+        self.cabin_floor_number = 0
+class ElevatorController:
+    
+    def __init__(self):
+        self.context = ContextStates()
     def isIdle(self):
-        return self.state is ElevatorState.IDLE
+        return isinstance(self.context.state, IdleElevatorState)
     
     def isWorking(self):
-        return self.state is ElevatorState.WORKING
+        return isinstance(self.context.state, WorkingElevatorState)
     
     def isCabinStopped(self):
-        return self.cabin_state is CabinState.STOPPED
+        return isinstance(self.context.cabin_state, StoppedCabinState)
     
     def isCabinMoving(self):
-        return self.cabin_state is CabinState.MOVING
+        return isinstance(self.context.cabin_state, MovingCabinState)
 
     def isCabinWaitingForPeople(self):
-        return self.cabin_state is CabinState.STOPPED
+        return self.isCabinStopped()
     
     def isCabinDoorOpened(self):
-        return self.cabin_door_state is CabinDoorState.OPENED
+        return isinstance(self.context.cabin_door_state, OpenedCabinDoorState)
     
     def isCabinDoorOpening(self):
-        return self.cabin_door_state is CabinDoorState.OPENING
+        return isinstance(self.context.cabin_door_state, OpeningCabinDoorState)
 
     def isCabinDoorClosing(self):
-        return self.cabin_door_state is CabinDoorState.CLOSING
+        return isinstance(self.context.cabin_door_state, ClosingCabinDoorState)
     
     def isCabinDoorClosed(self):
-        return self.cabin_door_state is CabinDoorState.CLOSED
+        return isinstance(self.context.cabin_door_state, ClosedCabinDoorState)
 
     def cabinFloorNumber(self):
-        return self.cabin_floor_number
+        return self.context.cabin_floor_number
 
     def goUpPushedFromFloor(self, floor):
-        if self.isIdle():
-            self.state = ElevatorState.WORKING
-            self.cabin_door_state = CabinDoorState.CLOSING
-        else :
-            floorToGoStack.append(floor)
+        self.context.state.goUpPushedFromFloor(floor)
 
     def cabinDoorClosed(self):
-        if self.isCabinDoorOpened() or self.isCabinDoorOpening() or self.isCabinDoorClosed():
-           raise ElevatorEmergency("Sensor de puerta desincronizado")
-
-        self.cabin_state = CabinState.MOVING
-        self.cabin_door_state = CabinDoorState.CLOSED
+        self.context.cabin_door_state.cabinDoorClosed()
         
     def cabinOnFloor(self, floor):
-        if self.isCabinStopped() or abs(self.cabin_floor_number - floor) > 1 :
-           raise ElevatorEmergency("Sensor de cabina desincronizado")
-        self.cabin_state = CabinState.STOPPED
-        self.cabin_door_state = CabinDoorState.OPENING
-        self.cabin_floor_number = floor
+        self.context.cabin_state.cabinOnFloor(floor)
 
     def cabinDoorOpened(self):
-        if not floorToGoStack:
-            self.state = ElevatorState.IDLE
+        self.context.cabin_door_state = OpenedCabinDoorState(self.context)
+        if not self.context.floorToGoStack:
+            self.context.state = IdleElevatorState(self.context)
         else :
-            self.state = ElevatorState.WORKING
-        self.cabin_door_state = CabinDoorState.OPENED
+            self.context.state = WorkingElevatorState(self.context)
 
     def waitForPeopleTimedOut(self):
-        self.cabin_door_state = CabinDoorState.CLOSING
+        self.context.cabin_door_state = ClosingCabinDoorState(self.context)
     
     def openCabinDoor(self):
-        if self.isCabinStopped() and not self.isCabinDoorOpened() or self.isCabinDoorClosing():
-            self.cabin_door_state = CabinDoorState.OPENING
+        self.context.cabin_door_state.openCabinDoor()
+
 
     def closeCabinDoor(self):
-        if self.isWorking() and not self.isCabinDoorClosed() and not self.isCabinDoorOpening():
-            self.cabin_door_state = CabinDoorState.CLOSING
+        self.context.cabin_door_state.closeCabinDoor()
+
 
 class ElevatorEmergency(Exception):
     def __init__(self, message):
@@ -404,9 +430,7 @@ class ElevatorTest(unittest.TestCase):
             self.fail()
         except ElevatorEmergency as elevatorEmergency:
             self.assertTrue (elevatorEmergency.message == "Sensor de puerta desincronizado")
-        
-    
-
+            
     def test21ElevatorHasToEnterEmergencyIfDoorClosesWhenOpening(self):
         elevatorController = ElevatorController()
         
@@ -418,11 +442,6 @@ class ElevatorTest(unittest.TestCase):
             self.fail()
         except ElevatorEmergency as elevatorEmergency:
             self.assertTrue (elevatorEmergency.message == "Sensor de puerta desincronizado")
-        
-    
-
-    # # STOP HERE!!
-    # # More tests here to verify bad sensor function
     
     def test22CabinHasToStopOnTheFloorsOnItsWay(self):
         elevatorController = ElevatorController()
