@@ -8,19 +8,48 @@
 # California, 94041, USA.
 #  
 import unittest
-from ElevatorController import ElevatorController
-            
+from ElevatorController import ElevatorController, CabinDoorClosingState, CabinDoorClosedState, CabinMovingState, CabinStoppedState, CabinDoorOpeningState, CabinState, CabinDoorState
+
 class ElevatorControllerConsole:
     def __init__(self,elevatorController):
-        pass
+        self._controller = elevatorController
+        self._lines = []
+        self._controller.acceptVisitor(self)
+        self._stateToString = {
+            CabinDoorClosingState : "Puerta Cerrandose",
+            CabinDoorClosedState : "Puerta Cerrada",
+            CabinMovingState : "Cabina Moviendose",
+            CabinStoppedState : "Cabina Detenida",
+            CabinDoorOpeningState : "Puerta Abriendose"
+            }
+
+    def visit(self, aState):
+        self._lines.append(self._stateToString[aState])
         
     def lines(self):
-        pass
+        return self._lines
 
 class ElevatorControllerStatusView:
     def __init__(self,elevatorController):
-        pass
+        self._controller = elevatorController
+        self._controller.acceptVisitor(self)
+        self._doorState = None
+        self._cabinState = None
+        self._cabinStateToString = {CabinStoppedState : "Stopped"}
+        self._doorStateToString = {CabinDoorOpeningState : "Opening"}
     
+    def visit(self, aState):
+        if aState.__bases__[0] == CabinState:
+            self._cabinState = aState
+        else:
+            self._doorState = aState
+
+    def cabinStateFieldModel(self):
+        return self._cabinStateToString[self._cabinState]
+    
+    def cabinDoorStateFieldModel(self):
+        return self._doorStateToString[self._doorState]
+        
 class ElevatorControllerViewTest(unittest.TestCase):
     
     def test01ElevatorControllerConsoleTracksDoorClosingState(self):

@@ -384,17 +384,23 @@ class ElevatorControllerIsWorkingState(ElevatorControllerState):
 class ElevatorController:
 
     def __init__(self):
+        self._visitors = []
         self.controllerIsIdle()
         self.cabinIsStopped()
         self.cabinDoorIsOpened()
         self._cabinFloorNumber = 0
         self._floorsToGo = []
     
+    def acceptVisitor(self, visitor):
+        self._visitors.append(visitor)
+
     def cabinDoorIsOpened(self):
         self._cabinDoorState = CabinDoorOpenedState(self)
     
     def cabinIsStopped(self):
         self._cabinState = CabinStoppedState(self)
+        for v in self._visitors:
+            v.visit(CabinStoppedState)
     
     def controllerIsIdle(self):
         self._state = ElevatorControllerIdleState(self)
@@ -463,6 +469,8 @@ class ElevatorController:
     
     def cabinDoorIsClosing(self):
         self._cabinDoorState = CabinDoorClosingState(self)
+        for v in self._visitors:
+            v.visit(CabinDoorClosingState)
     
     def controllerIsWorking(self):
         self._state = ElevatorControllerIsWorkingState(self)
@@ -475,7 +483,11 @@ class ElevatorController:
     
     def cabinDoorClosedWhenWorkingAndCabinStoppedAndClosing(self):
         self._cabinDoorState = CabinDoorClosedState(self)
+        for v in self._visitors:
+            v.visit(CabinDoorClosedState)
         self._cabinState = CabinMovingState(self)
+        for v in self._visitors:
+            v.visit(CabinMovingState)
         
     def cabinOnFloorWhenWorking(self, aFloorNumber):
         if (aFloorNumber<self._cabinFloorNumber):
@@ -491,6 +503,8 @@ class ElevatorController:
           
     def cabinDoorIsOpening(self):
         self._cabinDoorState = CabinDoorOpeningState(self)
+        for v in self._visitors:
+            v.visit(CabinDoorOpeningState)
         
     def cabinOnFloorWhenIdle(self, aFloorNumber):
         raise ElevatorEmergency("Sensor de cabina desincronizado")
