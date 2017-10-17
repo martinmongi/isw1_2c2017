@@ -39,10 +39,12 @@ class ElevatorControllerStatusView:
         self._doorStateToString = {CabinDoorOpeningState : "Opening"}
     
     def visit(self, aState):
-        if aState.__bases__[0] == CabinState:
+        def updateCabinState(aState):
             self._cabinState = aState
-        else:
+        def updateDoorState(aState):
             self._doorState = aState
+        typeIdentifier = {CabinState : updateCabinState, CabinDoorState : updateDoorState}
+        typeIdentifier[aState.__bases__[0]](aState)
 
     def cabinStateFieldModel(self):
         return self._cabinStateToString[self._cabinState]
