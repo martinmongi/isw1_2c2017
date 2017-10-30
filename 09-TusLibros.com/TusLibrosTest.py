@@ -1,15 +1,17 @@
 import unittest
-from TusLibros import ShoppingCart, Cashier, MerchantConnection, TransactionError
+from TusLibros import ShoppingCart, Cashier, MerchantConnection, TransactionError, CreditCard
 import math
+from datetime import datetime
 
 
 class MockMerchantConnection(MerchantConnection):
     def __init__(self, base_url):
         self.base_url = base_url
 
-    def processTransaction(self, creditCardData, transactionAmount):
-        if creditCardData == ("5400000000000001", "072011", "PEPE SANCHEZ") and \
-                math.fabs(transactionAmount - 123.5) < .1:
+    def processTransaction(self, credit_card, transaction_amount):
+        if credit_card.number == "5400000000000001" and \
+                credit_card.owner == "PEPE SANCHEZ" and \
+                math.fabs(transaction_amount - 123.5) < .1:
             return "TEST TRANSACTION ID"
         raise TransactionError("Credit card transaction failed")
 
@@ -55,6 +57,51 @@ class ShoppingCartTest(unittest.TestCase):
                 e.message, "Book Quantity must be a positive integer")
 
 
+class CreditCardTest(unittest.TestCase):
+    def test01CannotCreateCCWithShorterNumber(self):
+        try:
+            cc = CreditCard("123456", "071993", "RENE FAVALORO")
+            self.fail()
+        except ValueError as e:
+            self.assertEqual(e.message, "Credit card data has wrong format")
+
+    def test02CannotCreateCCWithMonthBiggerThan12(self):
+        try:
+            cc = CreditCard("1234567890123456", "131993", "RENE FAVALORO")
+            self.fail()
+        except ValueError as e:
+            self.assertEqual(e.message, "Credit card data has wrong format")
+
+    def test03CannotCreateCCWithYearZero(self):
+        try:
+            cc = CreditCard("1234567890123456", "130000", "RENE FAVALORO")
+            self.fail()
+        except ValueError as e:
+            self.assertEqual(e.message, "Credit card data has wrong format")
+
+    def test04CannotCreateCCWithEmptyName(self):
+        try:
+            cc = CreditCard("1234567890123456", "130000", "")
+            self.fail()
+        except ValueError as e:
+            self.assertEqual(e.message, "Credit card data has wrong format")
+
+    def test04CannotCreateCCWithEmptyName(self):
+        try:
+            cc = CreditCard("1234567890123456", "130000", "")
+            self.fail()
+        except ValueError as e:
+            self.assertEqual(e.message, "Credit card data has wrong format")
+
+    def test05CanCreateCCWithCorrectData(self):
+        cc = CreditCard("1234567890123456", "022012", "RENE FAVALORO")
+        self.assertEqual(cc.number, "1234567890123456")
+        self.assertEqual(cc.expiration_date.year, 2012)
+        self.assertEqual(cc.expiration_date.month, 2)
+        self.assertEqual(cc.expiration_date.day, 29)
+        self.assertEqual(cc.owner, "RENE FAVALORO")
+
+
 class CashierTest(unittest.TestCase):
 
     def setUp(self):
@@ -62,27 +109,43 @@ class CashierTest(unittest.TestCase):
         self.cart = ShoppingCart(self.catalog)
         self.merchant_connection = MockMerchantConnection(
             "https://merchanttest.com/debit")
-        self.credit_card_data = ("5400000000000001", "072011", "PEPE SANCHEZ")
+        exp_date = str(datetime.now().month).zfill(
+            2) + str(datetime.now().year)
+        self.credit_card = CreditCard(
+            "5400000000000001", exp_date, "PEPE SANCHEZ")
         self.cashier = Cashier(self.catalog, self.merchant_connection)
 
     def test01CashierWontCheckOutEmptyCart(self):
         try:
             transaction_id = self.cashier.checkOut(
-                self.cart, self.credit_card_data)
+                self.cart, self.credit_card)
             self.fail()
         except ValueError as e:
             self.assertEqual(e.message, "Cannot check out empty cart")
 
-    def test02CashiertWillCheckOutCartWithTestData(self):
+    def test02CashierWontCheckOutExpiredCreditCard(self):
+        self.cart.addBook(111, 1)
+        now = datetime.now()
+
+        new_credit_card_data = CreditCard(self.credit_card.number, str(
+            now.month).zfill(2) + str(now.year - 1), self.credit_card.owner)
+        try:
+            transaction_id = self.cashier.checkOut(
+                self.cart, new_credit_card_data)
+            self.fail()
+        except TransactionError as e:
+            self.assertEqual(e.message, "Credit card expired")
+
+    def test03CashiertWillCheckOutCartWithTestData(self):
         self.cart.addBook(111, 1)
         self.assertEqual("TEST TRANSACTION ID", self.cashier.checkOut(
-            self.cart, self.credit_card_data))
+            self.cart, self.credit_card))
 
-    def test03CashierWillFailWithWrongData(self):
+    def test04CashierWillFailWithoutTestData(self):
         self.cart.addBook(111, 2)
         try:
             transaction_id = self.cashier.checkOut(
-                self.cart, self.credit_card_data)
+                self.cart, self.credit_card)
             self.fail()
         except TransactionError as e:
             self.assertEqual(e.message, "Credit card transaction failed")
