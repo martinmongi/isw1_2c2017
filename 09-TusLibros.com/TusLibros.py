@@ -10,15 +10,34 @@ class ShoppingCart:
         self.__catalog = catalog
         self.__books = Counter()
 
-    def addBook(self, bookIsbn, bookQuantity):
-        if bookIsbn not in self.__catalog:
+    def add_book(self, book_isbn, book_quantity):
+        if book_isbn not in self.__catalog:
             raise ValueError("Book ISBN not in catalog")
-        if bookQuantity <= 0:
+        if book_quantity <= 0:
             raise ValueError("Book Quantity must be a positive integer")
-        self.__books[bookIsbn] += int(bookQuantity)
+        self.__books[book_isbn] += int(book_quantity)
 
     def contents(self):
         return self.__books
+
+    def total_price(self):
+        amount = 0.0
+        for book in self.__books:
+            amount += self.__books[book] * self.__catalog[book]
+        return amount
+
+class SalesBook:
+    def __init__(self):
+        self.__book = {}
+        self.__sale_amounts = Counter()
+
+    def add_sale(self, client_id, cart):
+        if client_id not in self.__book:
+            self.__book[client_id] = Counter()
+        self.__book[client_id] += cart.contents()
+        self.__sale_amounts[client_id] += cart.total_price()
+
+
 
 
 class CreditCard:
@@ -40,11 +59,12 @@ class CreditCard:
 
 
 class Cashier:
-    def __init__(self, catalog, merchant_connection):
+    def __init__(self, catalog, sales_book, merchant_connection):
         self.__catalog = catalog
+        self.__sales_book = sales_book
         self.__merchant_connection = merchant_connection
 
-    def checkOut(self, cart, credit_card):
+    def check_out(self, client_id, cart, credit_card):
         if not cart.contents():
             raise ValueError("Cannot check out empty cart")
 
@@ -54,11 +74,13 @@ class Cashier:
                 now.month < credit_card.expiration_date.month:
             raise TransactionError("Credit card expired")
 
-        amount = 0.0
-        for book in cart.contents():
-            amount += cart.contents()[book] * self.__catalog[book]
-        return self.__merchant_connection.processTransaction(credit_card, amount)
+        amount = cart.total_price()
+        transaction_id = self.__merchant_connection.processTransaction(
+            credit_card, amount)
+        
+        self.__sales_book.add_sale(client_id, cart)
 
+        return transaction_id
 
 class TransactionError(Exception):
     def __init__(self, message):
