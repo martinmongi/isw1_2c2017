@@ -13,7 +13,11 @@ class MockMerchantConnection(MerchantConnection):
                 credit_card.owner == "PEPE SANCHEZ" and \
                 math.fabs(transaction_amount - 123.5) < .1:
             return "TEST TRANSACTION ID"
-        raise TransactionError("Credit card transaction failed")
+        if credit_card.owner == "POOR PEPE":
+            raise TransactionError("Credit card transaction without money")
+        if credit_card.owner == "THIEF":
+            raise TransactionError("Credit card stolen")
+        # raise TransactionError("Credit card transaction failed")
 
 
 class ShoppingCartTest(unittest.TestCase):
@@ -144,14 +148,42 @@ class CashierTest(unittest.TestCase):
         self.assertEqual("TEST TRANSACTION ID", self.cashier.check_out(self.client_id,
                                                                        self.cart, self.credit_card))
 
-    def test04CashierWillFailWithoutTestData(self):
-        self.cart.add_book(111, 2)
+    def test04CashierWillFailWithoutMoneyInCreditCard(self):
+        exp_date = str(datetime.now().month).zfill(
+            2) + str(datetime.now().year)
+        self.credit_card = CreditCard(
+            "5400000000000001", exp_date, "POOR PEPE")
+        self.cart.add_book(111, 1)
+
         try:
             transaction_id = self.cashier.check_out(
                 self.client_id, self.cart, self.credit_card)
             self.fail()
         except TransactionError as e:
-            self.assertEqual(e.message, "Credit card transaction failed")
+            self.assertEqual(e.message, "Credit card transaction without money")
+
+    def test05CashierWillFailStolenCreditCard(self):
+        exp_date = str(datetime.now().month).zfill(
+            2) + str(datetime.now().year)
+        self.credit_card = CreditCard(
+            "5400000000000001", exp_date, "THIEF")
+        self.cart.add_book(111, 1)
+
+        try:
+            transaction_id = self.cashier.check_out(
+                self.client_id, self.cart, self.credit_card)
+            self.fail()
+        except TransactionError as e:
+            self.assertEqual(e.message, "Credit card stolen")
+
+    # def test04CashierWillFailWithoutTestData(self):
+    #     self.cart.add_book(111, 2)
+    #     try:
+    #         transaction_id = self.cashier.check_out(
+    #             self.client_id, self.cart, self.credit_card)
+    #         self.fail()
+    #     except TransactionError as e:
+    #         self.assertEqual(e.message, "Credit card transaction failed")
 
 
 if __name__ == "__main__":
