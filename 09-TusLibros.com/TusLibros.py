@@ -26,6 +26,7 @@ class ShoppingCart:
             amount += self.__books[book] * self.__catalog[book]
         return amount
 
+
 class SalesBook:
     def __init__(self):
         self.__book = {}
@@ -36,8 +37,6 @@ class SalesBook:
             self.__book[client_id] = Counter()
         self.__book[client_id] += cart.contents()
         self.__sale_amounts[client_id] += cart.total_price()
-
-
 
 
 class CreditCard:
@@ -77,10 +76,11 @@ class Cashier:
         amount = cart.total_price()
         transaction_id = self.__merchant_connection.processTransaction(
             credit_card, amount)
-        
+
         self.__sales_book.add_sale(client_id, cart)
 
         return transaction_id
+
 
 class TransactionError(Exception):
     def __init__(self, message):

@@ -160,7 +160,8 @@ class CashierTest(unittest.TestCase):
                 self.client_id, self.cart, self.credit_card)
             self.fail()
         except TransactionError as e:
-            self.assertEqual(e.message, "Credit card transaction without money")
+            self.assertEqual(
+                e.message, "Credit card transaction without money")
 
     def test05CashierWillFailStolenCreditCard(self):
         exp_date = str(datetime.now().month).zfill(
@@ -175,15 +176,6 @@ class CashierTest(unittest.TestCase):
             self.fail()
         except TransactionError as e:
             self.assertEqual(e.message, "Credit card stolen")
-
-    # def test04CashierWillFailWithoutTestData(self):
-    #     self.cart.add_book(111, 2)
-    #     try:
-    #         transaction_id = self.cashier.check_out(
-    #             self.client_id, self.cart, self.credit_card)
-    #         self.fail()
-    #     except TransactionError as e:
-    #         self.assertEqual(e.message, "Credit card transaction failed")
 
 
 if __name__ == "__main__":
