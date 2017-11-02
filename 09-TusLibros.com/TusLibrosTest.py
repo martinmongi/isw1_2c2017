@@ -17,14 +17,48 @@ class MockMerchantConnection(MerchantConnection):
             raise TransactionError("Credit card transaction without money")
         if credit_card.owner == "THIEF":
             raise TransactionError("Credit card stolen")
-        # raise TransactionError("Credit card transaction failed")
+        raise TransactionError("Credit card transaction failed")
+
+
+class ObjectFactory:
+    def __init__(self):
+        self.date_1yr_ahead = str(datetime.now().month).zfill(
+            2) + str(datetime.now().year + 1)
+        self.date_1yr_behind = str(datetime.now().month).zfill(
+            2) + str(datetime.now().year - 1)
+
+    def createCatalog(self):
+        return {12345: 100, 111: 123.5}
+
+    def createEmptyShoppingCart(self):
+        return ShoppingCart(self.createCatalog())
+
+    def createGoodCreditCard(self):
+        return CreditCard("5400000000000001", self.date_1yr_ahead, "PEPE SANCHEZ")
+
+    def createExpiredCreditCard(self):
+        return CreditCard("5400000000000001", self.date_1yr_behind, "PEPE SANCHEZ")
+
+    def createBrokeCreditCard(self):
+        return CreditCard("5400000000000001", self.date_1yr_ahead, "POOR PEPE")
+
+    def createStolenCreditCard(self):
+        return CreditCard("5400000000000001", self.date_1yr_ahead, "THIEF")
+
+    def createEmptySalesBook(self):
+        return SalesBook()
+
+    def createCashierWithMockMC(self, sales_book):
+        return Cashier(
+            self.createCatalog(), sales_book, MockMerchantConnection(
+                "https://merchanttest.com/debit"))
 
 
 class ShoppingCartTest(unittest.TestCase):
 
     def setUp(self):
-        self.catalog = {12345: 100, 111: 123.5}
-        self.cart = ShoppingCart(self.catalog)
+        self.object_factory = ObjectFactory()
+        self.cart = self.object_factory.createEmptyShoppingCart()
 
     def test01NewCartIsEmpty(self):
         self.assertEquals(self.cart.contents(), {})
@@ -109,17 +143,12 @@ class CreditCardTest(unittest.TestCase):
 class CashierTest(unittest.TestCase):
 
     def setUp(self):
-        self.catalog = {12345: 100, 111: 123.5}
-        self.cart = ShoppingCart(self.catalog)
-        self.merchant_connection = MockMerchantConnection(
-            "https://merchanttest.com/debit")
-        exp_date = str(datetime.now().month).zfill(
-            2) + str(datetime.now().year)
-        self.credit_card = CreditCard(
-            "5400000000000001", exp_date, "PEPE SANCHEZ")
-        self.sales_book = SalesBook()
-        self.cashier = Cashier(
-            self.catalog, self.sales_book, self.merchant_connection)
+        self.object_factory = ObjectFactory()
+        self.cart = self.object_factory.createEmptyShoppingCart()
+        self.credit_card = self.object_factory.createGoodCreditCard()
+        self.sales_book = self.object_factory.createEmptySalesBook()
+        self.cashier = self.object_factory.createCashierWithMockMC(
+            self.sales_book)
         self.client_id = "123ABC"
 
     def test01CashierWontCheckOutEmptyCart(self):
@@ -129,30 +158,32 @@ class CashierTest(unittest.TestCase):
             self.fail()
         except ValueError as e:
             self.assertEqual(e.message, "Cannot check out empty cart")
+            self.assertEqual(self.sales_book.get_purchases(
+                self.client_id), ({}, 0.0))
 
     def test02CashierWontCheckOutExpiredCreditCard(self):
         self.cart.add_book(111, 1)
         now = datetime.now()
 
-        new_credit_card_data = CreditCard(self.credit_card.number, str(
-            now.month).zfill(2) + str(now.year - 1), self.credit_card.owner)
+        new_credit_card_data = self.object_factory.createExpiredCreditCard()
         try:
             transaction_id = self.cashier.check_out(self.client_id,
                                                     self.cart, new_credit_card_data)
             self.fail()
         except TransactionError as e:
             self.assertEqual(e.message, "Credit card expired")
+            self.assertEqual(self.sales_book.get_purchases(
+                self.client_id), ({}, 0.0))
 
     def test03CashiertWillCheckOutCartWithTestData(self):
         self.cart.add_book(111, 1)
         self.assertEqual("TEST TRANSACTION ID", self.cashier.check_out(self.client_id,
                                                                        self.cart, self.credit_card))
+        self.assertEqual(self.sales_book.get_purchases(
+            self.client_id), ({111: 1}, 123.5))
 
     def test04CashierWillFailWithoutMoneyInCreditCard(self):
-        exp_date = str(datetime.now().month).zfill(
-            2) + str(datetime.now().year)
-        self.credit_card = CreditCard(
-            "5400000000000001", exp_date, "POOR PEPE")
+        self.credit_card = self.object_factory.createBrokeCreditCard()
         self.cart.add_book(111, 1)
 
         try:
@@ -162,12 +193,11 @@ class CashierTest(unittest.TestCase):
         except TransactionError as e:
             self.assertEqual(
                 e.message, "Credit card transaction without money")
+            self.assertEqual(self.sales_book.get_purchases(
+                self.client_id), ({}, 0.0))
 
     def test05CashierWillFailStolenCreditCard(self):
-        exp_date = str(datetime.now().month).zfill(
-            2) + str(datetime.now().year)
-        self.credit_card = CreditCard(
-            "5400000000000001", exp_date, "THIEF")
+        self.credit_card = self.object_factory.createStolenCreditCard()
         self.cart.add_book(111, 1)
 
         try:
@@ -176,6 +206,8 @@ class CashierTest(unittest.TestCase):
             self.fail()
         except TransactionError as e:
             self.assertEqual(e.message, "Credit card stolen")
+            self.assertEqual(self.sales_book.get_purchases(
+                self.client_id), ({}, 0.0))
 
 
 if __name__ == "__main__":

@@ -37,6 +37,13 @@ class SalesBook:
             self.__book[client_id] = Counter()
         self.__book[client_id] += cart.contents()
         self.__sale_amounts[client_id] += cart.total_price()
+    
+    def get_purchases(self, client_id):
+        if client_id in self.__book:
+            return (self.__book[client_id], self.__sale_amounts[client_id])
+        else:
+            return (Counter(), 0.0)
+
 
 
 class CreditCard:
