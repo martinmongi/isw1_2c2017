@@ -6,18 +6,28 @@ import calendar
 from uuid import uuid4
 
 class WebInterface:
-    def __init__(self, userbase, catalog, merchant_processor):
+    def __init__(self, userbase, catalog, merchant_processor, cart_timeout):
         self.__userbase = userbase
         self.__catalog = catalog
         self.__merchant_processor = merchant_processor
+        self.__cart_timeout = datetime.timedelta(minutes=cart_timeout)
         self.__carts = {}
+        self.__cart_timestamps = {}
         self.__sales_book = SalesBook()
+
+    def __verify_timeout(self, cart_id):
+        if datetime.datetime.now() - self.__cart_timestamps[cart_id] > self.__cart_timeout:
+            raise TimeoutError("Shopping cart has expired")
+    
+    def __update_timestamp(self, cart_id):
+        self.__cart_timestamps[cart_id] = datetime.datetime.now()
 
     def create_cart(self, client_id, password):
         if client_id in self.__userbase:
             if self.__userbase[client_id] == password:
                 cart_id = uuid4()
                 self.__carts[cart_id] = ShoppingCart(client_id, self.__catalog)
+                self.__update_timestamp(cart_id)
                 return cart_id
             else:
                 raise AuthenticationError("Wrong password")
@@ -26,12 +36,16 @@ class WebInterface:
 
     def list_cart(self, cart_id):
         try:
+            self.__verify_timeout(cart_id)
+            self.__update_timestamp(cart_id)
             return self.__carts[cart_id].contents()
         except KeyError:
             raise KeyError("Shopping cart not known")
 
     def add_to_cart(self, cart_id, isbn, quantity):
         try:
+            self.__verify_timeout(cart_id)
+            self.__update_timestamp(cart_id)
             return self.__carts[cart_id].add_book(isbn, quantity)
         except KeyError:
             raise KeyError("Shopping cart not known")
@@ -39,9 +53,18 @@ class WebInterface:
     def check_out_cart(self, cart_id, ccn, cced, cco):
         cashier = Cashier(self.__sales_book, self.__merchant_processor)
         try:
+            self.__verify_timeout(cart_id)
+            self.__update_timestamp(cart_id)
             return cashier.check_out(self.__carts[cart_id], CreditCard(ccn, cced, cco))
         except KeyError:
             raise KeyError("Shopping cart not known")
+
+    def list_purchases(self, client_id):
+        if client_id in self.__userbase:
+            return self.__sales_book.get_purchases(client_id)
+        else:
+            raise AuthenticationError("User not known")
+        
 
 
 class ShoppingCart:
@@ -136,6 +159,10 @@ class TransactionError(Exception):
         self.message = message
 
 class AuthenticationError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+class TimeoutError(Exception):
     def __init__(self, message):
         self.message = message
 

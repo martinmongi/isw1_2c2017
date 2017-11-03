@@ -1,10 +1,9 @@
 import unittest
-from TusLibros import ShoppingCart, Cashier, MerchantConnection, TransactionError, CreditCard, SalesBook, WebInterface, AuthenticationError
+from TusLibros import *
 import math
 from datetime import datetime
 from uuid import uuid4, UUID
 from random import choice
-
 
 class MockMerchantConnection(MerchantConnection):
     def __init__(self, base_url):
@@ -12,13 +11,13 @@ class MockMerchantConnection(MerchantConnection):
 
     def processTransaction(self, credit_card, transaction_amount):
         if credit_card.number == "5400000000000001" and \
-                credit_card.owner == "PEPE SANCHEZ" and \
-                math.fabs(transaction_amount - 123.5) < .1:
+                credit_card.owner == "PEPE SANCHEZ":
             return "TEST TRANSACTION ID"
         if credit_card.owner == "POOR PEPE":
             raise TransactionError("Credit card transaction without money")
         if credit_card.owner == "THIEF":
             raise TransactionError("Credit card stolen")
+        print(credit_card.number, credit_card.expiration_date, credit_card.owner)
         raise TransactionError("Credit card transaction failed")
 
 
@@ -224,11 +223,13 @@ class WebInterfaceTest(unittest.TestCase):
         self.object_factory = ObjectFactory()
         self.catalog = self.object_factory.createCatalog()
         self.empty_interface = WebInterface(
-            {}, self.catalog, self.object_factory.createMockMC())
+            {}, self.catalog, self.object_factory.createMockMC(), 30)
         self.user_id = uuid4()
         self.password = 'hello1234'
         self.interface = WebInterface(
-            {self.user_id: self.password}, self.catalog, self.object_factory.createMockMC())
+            {self.user_id: self.password}, self.catalog, self.object_factory.createMockMC(), 30)
+        self.die_fast_interface = WebInterface(
+            {self.user_id: self.password}, self.catalog, self.object_factory.createMockMC(), 0)
 
     def test01WontCreateCartWithNonExistentUser(self):
         try:
@@ -264,7 +265,17 @@ class WebInterfaceTest(unittest.TestCase):
         self.assertEqual(self.interface.list_cart(cart_id), {
                          self.object_factory.createBookIsbn(): quantity})
 
-    def test06ChecksOutCart(self):
+    def test06AddToCartFailsAfterCartTimesOut(self):
+
+        cart_id = self.die_fast_interface.create_cart(self.user_id, self.password)
+        try:
+            self.die_fast_interface.add_to_cart(
+                cart_id, self.object_factory.createBookIsbn(), 3)
+            self.fail()
+        except TimeoutError as e:
+            self.assertEqual(e.message, "Shopping cart has expired")
+
+    def test07ChecksOutCart(self):
         cart_id = self.interface.create_cart(self.user_id, self.password)
         cc = self.object_factory.createGoodCreditCard()
         quantity = 1
@@ -272,17 +283,32 @@ class WebInterfaceTest(unittest.TestCase):
             cart_id, self.object_factory.createBookIsbn(), quantity)
 
         exp_date = str(cc.expiration_date.month).zfill(
-            2) + str(cc.expiration_date.year + 1)
+            2) + str(cc.expiration_date.year)
         transaction_id = self.interface.check_out_cart(
             cart_id, cc.number, exp_date, cc.owner)
         self.assertEqual(transaction_id, "TEST TRANSACTION ID")
+        self.assertEqual(self.interface.list_purchases(
+            self.user_id), ({111: 1}, 123.5))
 
-    def test07ListsAllPurchases(self):
-        pass
-        # crear dos carritos, hacer check out de los dos y listar las dos compras
-    
-    def test08CartsBecomeUselessAfterXMinutes(self):
-        pass
+    def test09ListsAllPurchases(self):
+        cart1_id = self.interface.create_cart(self.user_id, self.password)
+        cart2_id = self.interface.create_cart(self.user_id, self.password)
+        cc = self.object_factory.createGoodCreditCard()
+
+        self.interface.add_to_cart(
+            cart1_id, self.object_factory.createBookIsbn(), 3)
+        self.interface.add_to_cart(
+            cart2_id, self.object_factory.createBookIsbn(), 4)
+
+        exp_date = str(cc.expiration_date.month).zfill(
+            2) + str(cc.expiration_date.year)
+        self.interface.check_out_cart(cart1_id, cc.number, exp_date, cc.owner)
+        self.interface.check_out_cart(cart2_id, cc.number, exp_date, cc.owner)
+
+        self.assertEqual(self.interface.list_purchases(
+            self.user_id), ({111: 7}, 123.5 * 7))
+
+
 
 
 if __name__ == "__main__":
