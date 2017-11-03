@@ -39,9 +39,9 @@ class WebInterface:
     def check_out_cart(self, cart_id, ccn, cced, cco):
         cashier = Cashier(self.__sales_book, self.__merchant_processor)
         try:
-            cashier.check_out()
-        except Exception:
-            pass
+            return cashier.check_out(self.__carts[cart_id], CreditCard(ccn, cced, cco))
+        except KeyError:
+            raise KeyError("Shopping cart not known")
 
 
 class ShoppingCart:

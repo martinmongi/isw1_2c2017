@@ -270,8 +270,19 @@ class WebInterfaceTest(unittest.TestCase):
         quantity = 1
         self.interface.add_to_cart(
             cart_id, self.object_factory.createBookIsbn(), quantity)
-        self.interface.check_out_cart(
-            cart_id, cc.number, cc.expiration_date, cc.owner)
+
+        exp_date = str(cc.expiration_date.month).zfill(
+            2) + str(cc.expiration_date.year + 1)
+        transaction_id = self.interface.check_out_cart(
+            cart_id, cc.number, exp_date, cc.owner)
+        self.assertEqual(transaction_id, "TEST TRANSACTION ID")
+
+    def test07ListsAllPurchases(self):
+        pass
+        # crear dos carritos, hacer check out de los dos y listar las dos compras
+    
+    def test08CartsBecomeUselessAfterXMinutes(self):
+        pass
 
 
 if __name__ == "__main__":
