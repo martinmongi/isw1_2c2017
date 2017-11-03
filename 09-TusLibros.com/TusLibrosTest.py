@@ -1,7 +1,9 @@
 import unittest
-from TusLibros import ShoppingCart, Cashier, MerchantConnection, TransactionError, CreditCard, SalesBook
+from TusLibros import ShoppingCart, Cashier, MerchantConnection, TransactionError, CreditCard, SalesBook, WebInterface, AuthenticationError
 import math
 from datetime import datetime
+from uuid import uuid4, UUID
+from random import choice
 
 
 class MockMerchantConnection(MerchantConnection):
@@ -30,8 +32,14 @@ class ObjectFactory:
     def createCatalog(self):
         return {12345: 100, 111: 123.5}
 
+    def createBookIsbn(self):
+        return 111
+
+    def createClientId(self):
+        return UUID('e9bbdaaf-b7b5-4d6a-b918-7dbf538a9603')
+
     def createEmptyShoppingCart(self):
-        return ShoppingCart(self.createCatalog())
+        return ShoppingCart(self.createClientId(), self.createCatalog())
 
     def createGoodCreditCard(self):
         return CreditCard("5400000000000001", self.date_1yr_ahead, "PEPE SANCHEZ")
@@ -48,10 +56,11 @@ class ObjectFactory:
     def createEmptySalesBook(self):
         return SalesBook()
 
+    def createMockMC(self):
+        return MockMerchantConnection("https://merchanttest.com/debit")
+
     def createCashierWithMockMC(self, sales_book):
-        return Cashier(
-            self.createCatalog(), sales_book, MockMerchantConnection(
-                "https://merchanttest.com/debit"))
+        return Cashier(sales_book, self.createMockMC())
 
 
 class ShoppingCartTest(unittest.TestCase):
@@ -61,11 +70,11 @@ class ShoppingCartTest(unittest.TestCase):
         self.cart = self.object_factory.createEmptyShoppingCart()
 
     def test01NewCartIsEmpty(self):
-        self.assertEquals(self.cart.contents(), {})
+        self.assertEqual(self.cart.contents(), {})
 
     def test02AddingOneBookSucceedsWhenBookInCatalog(self):
         self.cart.add_book(12345, 4)
-        self.assertEquals(self.cart.contents(), {12345: 4})
+        self.assertEqual(self.cart.contents(), {12345: 4})
 
     def test03AddingOneBookFailsWhenBookNotInCatalog(self):
         try:
@@ -73,17 +82,17 @@ class ShoppingCartTest(unittest.TestCase):
             self.fail()
         except ValueError as e:
             self.assertEqual(e.message, "Book ISBN not in catalog")
-            self.assertEquals(self.cart.contents(), {})
+            self.assertEqual(self.cart.contents(), {})
 
     def test04AddingMultipleDifferentBooksInCatalogSuceeds(self):
         self.cart.add_book(12345, 4)
         self.cart.add_book(111, 4)
-        self.assertEquals(self.cart.contents(), {12345: 4, 111: 4})
+        self.assertEqual(self.cart.contents(), {12345: 4, 111: 4})
 
     def test05AddingMultipleTimesSameBooksInCatalogSuceeds(self):
         self.cart.add_book(12345, 4)
         self.cart.add_book(12345, 3)
-        self.assertEquals(self.cart.contents(), {12345: 7})
+        self.assertEqual(self.cart.contents(), {12345: 7})
 
     def test06AddingNegativeQuantityFails(self):
         self.cart.add_book(12345, 4)
@@ -91,7 +100,7 @@ class ShoppingCartTest(unittest.TestCase):
             self.cart.add_book(12345, -2)
             self.fail()
         except ValueError as e:
-            self.assertEquals(
+            self.assertEqual(
                 e.message, "Book Quantity must be a positive integer")
 
 
@@ -149,12 +158,12 @@ class CashierTest(unittest.TestCase):
         self.sales_book = self.object_factory.createEmptySalesBook()
         self.cashier = self.object_factory.createCashierWithMockMC(
             self.sales_book)
-        self.client_id = "123ABC"
+        self.client_id = uuid4()
 
     def test01CashierWontCheckOutEmptyCart(self):
         try:
             transaction_id = self.cashier.check_out(
-                self.client_id, self.cart, self.credit_card)
+                self.cart, self.credit_card)
             self.fail()
         except ValueError as e:
             self.assertEqual(e.message, "Cannot check out empty cart")
@@ -167,8 +176,8 @@ class CashierTest(unittest.TestCase):
 
         new_credit_card_data = self.object_factory.createExpiredCreditCard()
         try:
-            transaction_id = self.cashier.check_out(self.client_id,
-                                                    self.cart, new_credit_card_data)
+            transaction_id = self.cashier.check_out(
+                self.cart, new_credit_card_data)
             self.fail()
         except TransactionError as e:
             self.assertEqual(e.message, "Credit card expired")
@@ -177,10 +186,10 @@ class CashierTest(unittest.TestCase):
 
     def test03CashiertWillCheckOutCartWithTestData(self):
         self.cart.add_book(111, 1)
-        self.assertEqual("TEST TRANSACTION ID", self.cashier.check_out(self.client_id,
-                                                                       self.cart, self.credit_card))
+        self.assertEqual("TEST TRANSACTION ID",
+                         self.cashier.check_out(self.cart, self.credit_card))
         self.assertEqual(self.sales_book.get_purchases(
-            self.client_id), ({111: 1}, 123.5))
+            self.cart.client_id()), ({111: 1}, 123.5))
 
     def test04CashierWillFailWithoutMoneyInCreditCard(self):
         self.credit_card = self.object_factory.createBrokeCreditCard()
@@ -188,7 +197,7 @@ class CashierTest(unittest.TestCase):
 
         try:
             transaction_id = self.cashier.check_out(
-                self.client_id, self.cart, self.credit_card)
+                self.cart, self.credit_card)
             self.fail()
         except TransactionError as e:
             self.assertEqual(
@@ -202,12 +211,67 @@ class CashierTest(unittest.TestCase):
 
         try:
             transaction_id = self.cashier.check_out(
-                self.client_id, self.cart, self.credit_card)
+                self.cart, self.credit_card)
             self.fail()
         except TransactionError as e:
             self.assertEqual(e.message, "Credit card stolen")
             self.assertEqual(self.sales_book.get_purchases(
                 self.client_id), ({}, 0.0))
+
+
+class WebInterfaceTest(unittest.TestCase):
+    def setUp(self):
+        self.object_factory = ObjectFactory()
+        self.catalog = self.object_factory.createCatalog()
+        self.empty_interface = WebInterface(
+            {}, self.catalog, self.object_factory.createMockMC())
+        self.user_id = uuid4()
+        self.password = 'hello1234'
+        self.interface = WebInterface(
+            {self.user_id: self.password}, self.catalog, self.object_factory.createMockMC())
+
+    def test01WontCreateCartWithNonExistentUser(self):
+        try:
+            self.empty_interface.create_cart(self.user_id, self.password)
+            self.fail()
+        except AuthenticationError as e:
+            self.assertEqual(e.message, "User not known")
+
+    def test02WontCreateCartWithWrongPassword(self):
+        try:
+            self.interface.create_cart(self.user_id, 'goodbye9876')
+            self.fail()
+        except AuthenticationError as e:
+            self.assertEqual(e.message, "Wrong password")
+
+    def test03CreatesEmptyCartWithCorrectCredentials(self):
+        cart_id = self.interface.create_cart(self.user_id, self.password)
+        self.assertEqual(self.interface.list_cart(cart_id), {})
+
+    def test04WontListNonExistantCart(self):
+        cart_id = uuid4()
+        try:
+            contents = self.interface.list_cart(cart_id)
+            self.fail()
+        except KeyError as e:
+            self.assertEqual(e.message, "Shopping cart not known")
+
+    def test05AddsBookToCart(self):
+        cart_id = self.interface.create_cart(self.user_id, self.password)
+        quantity = 7
+        self.assertTrue(self.interface.add_to_cart(
+            cart_id, self.object_factory.createBookIsbn(), quantity))
+        self.assertEqual(self.interface.list_cart(cart_id), {
+                         self.object_factory.createBookIsbn(): quantity})
+
+    def test06ChecksOutCart(self):
+        cart_id = self.interface.create_cart(self.user_id, self.password)
+        cc = self.object_factory.createGoodCreditCard()
+        quantity = 1
+        self.interface.add_to_cart(
+            cart_id, self.object_factory.createBookIsbn(), quantity)
+        self.interface.check_out_cart(
+            cart_id, cc.number, cc.expiration_date, cc.owner)
 
 
 if __name__ == "__main__":
