@@ -34,6 +34,9 @@ class ObjectFactory:
     def createBookIsbn(self):
         return 111
 
+    def createOtherBookIsbn(self):
+        return 12345
+
     def createClientId(self):
         return UUID('e9bbdaaf-b7b5-4d6a-b918-7dbf538a9603')
 
@@ -104,42 +107,51 @@ class ShoppingCartTest(unittest.TestCase):
 
 
 class CreditCardTest(unittest.TestCase):
-    def test01CannotCreateCCWithShorterNumber(self):
+
+    def test01CannotCreateCCWithEmptyName(self):
+        try:
+            cc = CreditCard("1234567890123456", "131993", "")
+            self.fail()
+        except ValueError as e:
+            self.assertEqual(e.message, "Credit card data has wrong format")
+
+    def test02CannotCreateCCWithEmptyExpiratationDate(self):
+        try:
+            cc = CreditCard("1234567890123456", "", "RENE FAVALORO")
+            self.fail()
+        except ValueError as e:
+            self.assertEqual(e.message, "Credit card data has wrong format")
+    
+    def test03CannotCreateCCWithEmptyCreditCardNumber(self):
+        try:
+            cc = CreditCard("", "131993", "RENE FAVALORO")
+            self.fail()
+        except ValueError as e:
+            self.assertEqual(e.message, "Credit card data has wrong format")
+
+
+    def test04CannotCreateCCWithShorterNumber(self):
         try:
             cc = CreditCard("123456", "071993", "RENE FAVALORO")
             self.fail()
         except ValueError as e:
             self.assertEqual(e.message, "Credit card data has wrong format")
 
-    def test02CannotCreateCCWithMonthBiggerThan12(self):
+    def test05CannotCreateCCWithMonthBiggerThan12(self):
         try:
             cc = CreditCard("1234567890123456", "131993", "RENE FAVALORO")
             self.fail()
         except ValueError as e:
             self.assertEqual(e.message, "Credit card data has wrong format")
 
-    def test03CannotCreateCCWithYearZero(self):
+    def test06CannotCreateCCWithYearZero(self):
         try:
             cc = CreditCard("1234567890123456", "130000", "RENE FAVALORO")
             self.fail()
         except ValueError as e:
             self.assertEqual(e.message, "Credit card data has wrong format")
 
-    def test04CannotCreateCCWithEmptyName(self):
-        try:
-            cc = CreditCard("1234567890123456", "130000", "")
-            self.fail()
-        except ValueError as e:
-            self.assertEqual(e.message, "Credit card data has wrong format")
-
-    def test04CannotCreateCCWithEmptyName(self):
-        try:
-            cc = CreditCard("1234567890123456", "130000", "")
-            self.fail()
-        except ValueError as e:
-            self.assertEqual(e.message, "Credit card data has wrong format")
-
-    def test05CanCreateCCWithCorrectData(self):
+    def test07CanCreateCCWithCorrectData(self):
         cc = CreditCard("1234567890123456", "022012", "RENE FAVALORO")
         self.assertEqual(cc.number, "1234567890123456")
         self.assertEqual(cc.expiration_date.year, 2012)
@@ -293,20 +305,24 @@ class WebInterfaceTest(unittest.TestCase):
     def test09ListsAllPurchases(self):
         cart1_id = self.interface.create_cart(self.user_id, self.password)
         cart2_id = self.interface.create_cart(self.user_id, self.password)
+        cart3_id = self.interface.create_cart(self.user_id, self.password)
         cc = self.object_factory.createGoodCreditCard()
 
         self.interface.add_to_cart(
             cart1_id, self.object_factory.createBookIsbn(), 3)
         self.interface.add_to_cart(
             cart2_id, self.object_factory.createBookIsbn(), 4)
+        self.interface.add_to_cart(
+            cart3_id, self.object_factory.createOtherBookIsbn(), 3)
 
         exp_date = str(cc.expiration_date.month).zfill(
             2) + str(cc.expiration_date.year)
         self.interface.check_out_cart(cart1_id, cc.number, exp_date, cc.owner)
         self.interface.check_out_cart(cart2_id, cc.number, exp_date, cc.owner)
-
+        self.interface.check_out_cart(cart3_id, cc.number, exp_date, cc.owner)
+        print self.interface.list_purchases(self.user_id)
         self.assertEqual(self.interface.list_purchases(
-            self.user_id), ({111: 7}, 123.5 * 7))
+            self.user_id), ({111: 7, 12345: 3}, 123.5 * 7 + 100 * 3))
 
 
 
